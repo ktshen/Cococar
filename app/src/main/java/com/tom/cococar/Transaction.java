@@ -10,16 +10,18 @@ public class Transaction {
     String latitude;
     String longitude;
     String url;
+    String talk;
 
     public Transaction() {
     }
 
-    public Transaction(String id, String rand, String latitude, String longitude, String url) {
+    public Transaction(String id, String rand, String latitude, String longitude, String url, String talk) {
         this.id = id;
         this.rand = rand;
         this.latitude = latitude;
         this.longitude = longitude;
         this.url = url;
+        this.talk = talk;
     }
 
     public String getId() {

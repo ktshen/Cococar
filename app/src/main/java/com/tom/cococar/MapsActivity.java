@@ -21,6 +21,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -35,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,10 +47,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,6 +74,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleApiClient mGoogleApiClient;
     LocationRequest locationRequest;
     String id = "id";
+    String rand = Integer.toString((int) (Math.random()*10000));
+    boolean talkadd = false;
+    private EditText edtalk;
+    private Button submit;
 
     private static ExecutorService THREAD_POOL_EXECUTOR;
     static {
@@ -74,7 +88,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        edtalk = (EditText) findViewById(R.id.ed_talk);
+        submit = (Button) findViewById(R.id.submit);
         int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
@@ -285,15 +300,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title("Current Position"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
         }
-        int random = (int) (Math.random()*10000);
-        String rand = Integer.toString(random);
-        url=url+rand;
+        String liverand = "marker"+rand;
+        url=url+liverand;
         Log.d("bg", url);
         String method="register";
         String longitude = String.valueOf(location.getLongitude());
         String latitude = String.valueOf(location.getLatitude());
         BackgroundTask backgroundTask=new BackgroundTask(this);
-        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,rand,longitude,latitude,url);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
 
         //連結到camera
 
@@ -316,8 +330,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String latitude = obj.getString("latitude");
                 String longitude = obj.getString("longitude");
                 String url = obj.getString("url");
+                String talk = obj.getString("talk");
                 Log.d("COCO", id + "/" + rand + "/" + latitude + "/" + longitude + "/" + url);
-                Transaction t = new Transaction(id, rand, latitude, longitude, url);
+                Transaction t = new Transaction(id, rand, latitude, longitude, url, talk);
                 trans.add(t);
             }
         } catch (JSONException e) {
@@ -419,20 +434,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String mtitle = m.getTitle();
                         Log.d("ProcessUpdate", mtitle);
                         if (mtitle.equals(tran.rand)) {
-                            m.setPosition(Now);
-                            markerlistcopy.add(m);
-                            markerlist.remove(m);
-                            inList = true;
-                            break;
+                            if(rand.indexOf("marker") != -1) {
+                                m.setPosition(Now);
+                                markerlistcopy.add(m);
+                                markerlist.remove(m);
+                                inList = true;
+                                break;
+                            }
+                            else if(rand.indexOf("user") != -1){
+                                m.setSnippet(tran.talk);
+                                markerlistcopy.add(m);
+                                markerlist.remove(m);
+                                inList = true;
+                                break;
+                            }
                         }
                     }
                 }
                 if (!inList) {
-                    Marker marker = mMap.addMarker(new MarkerOptions()
-                            .position(Now)
-                            .title(tran.rand)
-                            .snippet(tran.url));
-                    markerlistcopy.add(marker);
+                    String rand = tran.rand;
+                    if(rand.indexOf("marker") != -1) {
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                .position(Now)
+                                .title(tran.rand)
+                                .snippet(tran.url));
+                        markerlistcopy.add(marker);
+                    }
+                    else if(rand.indexOf("user") != -1){
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                .position(Now)
+                                .title(tran.id)
+                                .snippet(tran.talk)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.bubble2)));
+                        markerlistcopy.add(marker);
+                        marker.showInfoWindow();
+                    }
+
                 }
             }
 
@@ -441,6 +478,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             markerlist.clear();
             markerlist = markerlistcopy;
+        }
+    }
+
+    public void submit(View v) {
+        LocationManager locationManager =
+                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        // 設定標準為存取精確
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
+        String provider = locationManager.getBestProvider(criteria, true);
+        //noinspection MissingPermission
+        Location location = locationManager.getLastKnownLocation("network");
+        String fixrand = "user"+rand;
+        if(!talkadd) {
+            Toast toast = Toast.makeText(this, "Add a fix marker", Toast.LENGTH_SHORT);
+            toast.show();
+            String method = "register";
+            String longitude = String.valueOf(location.getLongitude());
+            String latitude = String.valueOf(location.getLatitude());
+            BackgroundTask backgroundTask = new BackgroundTask(this);
+            backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR, method, id, fixrand, longitude, latitude, "");//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+            talkadd = true;
+        }
+        String w=edtalk.getText().toString();
+        TalkTask talkTask=new TalkTask();
+        talkTask.executeOnExecutor(THREAD_POOL_EXECUTOR,w,fixrand);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+
+    }
+
+    public class TalkTask extends AsyncTask<String, Void, Void>
+    {
+        protected Void doInBackground(String... params) //背景中做的事
+        {
+            Log.d("timmy", "in back");
+            String reg_url = "http://140.115.158.81/project/talk.php";
+            String talk_get = params[0];
+            String rand_get=params[1];
+            try {
+                Log.d("COCO", "in back 2");
+                URL url = new URL(reg_url);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                //　先取得HttpURLConnection urlConn = new URL("http://www.google.com").openConnection();
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
+                OutputStream os = httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
+                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                Log.d("timmy", "in back 3");
+                String data =  URLEncoder.encode("rand","UTF-8")+"="+URLEncoder.encode(rand_get,"UTF-8")+"&"+URLEncoder.encode("talk", "UTF-8") + "=" + URLEncoder.encode(talk_get, "UTF-8");
+                Log.d("timmy", "in back 4");
+                //&在php中表示下一個表單欄位的開始
+                bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。
+                bufferedWriter.flush();//flush();將緩衝數據寫到文件去
+                bufferedWriter.close();
+                os.close();
+                InputStream IS = httpURLConnection.getInputStream();
+                IS.close();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return  null;
+        }
+
+        @Override
+        protected void  onPreExecute() //AsyncTask 執行時會 第一個被呼叫的
+        {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values)//會以 Void 的型態回報進度
+        {
+            super.onProgressUpdate(values);
         }
     }
 }
