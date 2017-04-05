@@ -156,9 +156,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //連結到撥放器
-                Intent intent = getPackageManager().getLaunchIntentForPackage("tcking.github.com.giraffeplayer");
-                intent.putExtra("url",marker.getSnippet());
-                startActivity(intent);
+                if(marker.getTitle().indexOf("marker")!=-1) {
+                    Intent intent = getPackageManager().getLaunchIntentForPackage("tcking.github.com.giraffeplayer");
+                    intent.putExtra("url", marker.getSnippet());
+                    startActivity(intent);
+                }
                 return false;
             }
         });
@@ -462,6 +464,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(tran.rand)
                                 .snippet(tran.url));
                         markerlistcopy.add(marker);
+                        marker.hideInfoWindow();
                     }
                     else if(rand.indexOf("user") != -1){
                         Marker marker = mMap.addMarker(new MarkerOptions()
