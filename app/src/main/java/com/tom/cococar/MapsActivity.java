@@ -8,7 +8,9 @@ import static android.Manifest.permission.*;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -60,6 +62,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,10 +81,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String rand = Integer.toString((int) (Math.random()*10000));
     boolean talkadd = false;
     private EditText edtalk;
+    private EditText e_address;
     private Button submit;
     private Button delete;
     String liverand="";
     String fixrand="";
+    String strAddress="";
+
     private static ExecutorService THREAD_POOL_EXECUTOR;
     static {
         THREAD_POOL_EXECUTOR = (ExecutorService) Executors.newFixedThreadPool(10);
@@ -92,21 +99,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         Intent intent=getIntent();
         id=intent.getStringExtra("id");
+        e_address= (EditText) findViewById(R.id.address);
         edtalk = (EditText) findViewById(R.id.ed_talk);
         submit = (Button) findViewById(R.id.submit);
         delete=(Button)findViewById(R.id.delete);
-        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // 無權限，向使用者請求
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{CAMERA},
-                    REQUEST_CAMERA
-            );
 
-        } else {
-            //已有權限，執行程式
-        }
+//        //相機權限
+//        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+//        if (permission != PackageManager.PERMISSION_GRANTED) {
+//            // 無權限，向使用者請求
+//            ActivityCompat.requestPermissions(
+//                    this,
+//                    new String[]{CAMERA},
+//                    REQUEST_CAMERA
+//            );
+//
+//        } else {
+//            //已有權限，執行程式
+//        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -144,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //位置權限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,
@@ -210,9 +221,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (location != null) {
                         Log.i("LOCATION", location.getLatitude() + "/" +
                                 location.getLongitude());
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(location.getLatitude(), location.getLongitude())
-                                , 15));
+//                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+//                                new LatLng(location.getLatitude(), location.getLongitude())
+//                                , 15));
                     }
                     return false;
                 }
@@ -282,9 +293,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(location.getLatitude(), location.getLongitude())
-                    , 15));
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+//                    new LatLng(location.getLatitude(), location.getLongitude())
+//                    , 15));
+        }
+    }
+
+    public void search(View view){
+        strAddress = e_address.getText().toString();
+        try {
+            Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
+            List<Address> addressLocation = geoCoder.getFromLocationName(strAddress, 1);
+            double latitude = addressLocation.get(0).getLatitude();
+            double longitude = addressLocation.get(0).getLongitude();
+            Log.d("經度", "=" + longitude);
+            Log.d("緯度", "=" + latitude);
+            LatLng Search = new LatLng(latitude, longitude);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 12));
+        }catch (IOException e){
         }
     }
 

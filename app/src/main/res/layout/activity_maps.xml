@@ -6,6 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:text="search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/search"
+        android:onClick="search"
+        android:layout_above="@+id/submit"
+        android:layout_alignLeft="@+id/delete"
+        android:layout_alignStart="@+id/delete" />
+
     <Button android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -40,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:text="say something..."
+        android:hint="say something..."
         android:ems="10"
         android:layout_marginBottom="42dp"
         android:id="@+id/ed_talk"
@@ -48,6 +58,20 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/address"
+        android:hint="address or location"
+        tools:text="address or location"
+        android:layout_above="@+id/ed_talk"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/submit"
+        android:layout_alignEnd="@+id/submit" />
 
     <Button
         android:text="delete"
