@@ -38,8 +38,10 @@ public class Login extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                Profile profile=Profile.getCurrentProfile();
+                facebookid=profile.getName();
                 Log.d("facebook","coco" );
-                facebookid=loginResult.getAccessToken().getUserId();
+                //facebookid=loginResult.getAccessToken().getUserId();
                 Log.i("facebook",facebookid );
                 goMainScreen();
             }

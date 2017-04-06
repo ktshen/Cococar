@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
 
     <uses-feature android:name="android.hardware.camera" />
@@ -51,8 +52,15 @@
 
         </activity>
         <activity
-            android:name=".CameraActivity"
-            android:configChanges="orientation|screenSize"></activity>
+            android:name=".CameraActivity">
+
+            android:configChanges="orientation|screenSize">
+            <intent-filter>
+                <action android:name="com.tom.cococar.CameraActivity"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

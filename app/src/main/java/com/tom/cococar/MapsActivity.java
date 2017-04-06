@@ -289,6 +289,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void live_button(View view) {
+        String url1 = "rtmp://140.115.158.81:1935/live/";
         Toast toast = Toast.makeText(this, "Add a new marker", Toast.LENGTH_SHORT);
         toast.show();
         LocationManager locationManager =
@@ -308,8 +309,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
         }
         liverand = "marker"+rand;
-        url=url+liverand;
-        Log.d("bg", url);
+        url1=url1+liverand;
+        Log.d("bg", url1);
         String method="register";
         String longitude = String.valueOf(location.getLongitude());
         String latitude = String.valueOf(location.getLatitude());
@@ -319,7 +320,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //連結到camera
 
         Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("url", url);
+        intent.putExtra("url", url1);
+        Log.d("janices", "in back 3");
         startActivity(intent);
     }
 
