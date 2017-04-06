@@ -5,7 +5,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "com.tom.mapexample"
+        applicationId "com.tom.cococar"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
