@@ -90,6 +90,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Intent intent=getIntent();
+        id=intent.getStringExtra("id");
         edtalk = (EditText) findViewById(R.id.ed_talk);
         submit = (Button) findViewById(R.id.submit);
         delete=(Button)findViewById(R.id.delete);
