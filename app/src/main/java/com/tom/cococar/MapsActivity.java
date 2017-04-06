@@ -16,6 +16,10 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -80,6 +84,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String id = "id";
     String rand = Integer.toString((int) (Math.random()*10000));
     boolean talkadd = false;
+    boolean voiceopen = false;
+    boolean livestart = false;
     private EditText edtalk;
     private EditText e_address;
     private Button submit;
@@ -87,6 +93,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String liverand="";
     String fixrand="";
     String strAddress="";
+
+    //聲控
+    private SpeechRecognizer recognizer;
+    private Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+    final Handler handler = new Handler();
 
     private static ExecutorService THREAD_POOL_EXECUTOR;
     static {
@@ -104,19 +115,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         submit = (Button) findViewById(R.id.submit);
         delete=(Button)findViewById(R.id.delete);
 
-//        //相機權限
-//        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-//        if (permission != PackageManager.PERMISSION_GRANTED) {
-//            // 無權限，向使用者請求
-//            ActivityCompat.requestPermissions(
-//                    this,
-//                    new String[]{CAMERA},
-//                    REQUEST_CAMERA
-//            );
-//
-//        } else {
-//            //已有權限，執行程式
-//        }
+        //聲控
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        recognizer.setRecognitionListener(new MyRecognizerListener());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -132,6 +134,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         createLocationRequest();
         UpdateSync update = new UpdateSync();
         update.executeOnExecutor(THREAD_POOL_EXECUTOR);
+        LiveTask live = new LiveTask();
+        live.executeOnExecutor(THREAD_POOL_EXECUTOR);
     }
 
     private void createLocationRequest() {
@@ -300,57 +304,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void search(View view){
-        strAddress = e_address.getText().toString();
-        try {
-            Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
-            List<Address> addressLocation = geoCoder.getFromLocationName(strAddress, 1);
-            double latitude = addressLocation.get(0).getLatitude();
-            double longitude = addressLocation.get(0).getLongitude();
-            Log.d("經度", "=" + longitude);
-            Log.d("緯度", "=" + latitude);
-            LatLng Search = new LatLng(latitude, longitude);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 12));
-        }catch (IOException e){
+        if(!e_address.getText().toString().isEmpty()) {
+            strAddress = e_address.getText().toString();
+            try {
+                Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
+                List<Address> addressLocation = geoCoder.getFromLocationName(strAddress, 1);
+                double latitude = addressLocation.get(0).getLatitude();
+                double longitude = addressLocation.get(0).getLongitude();
+                Log.d("經度", "=" + longitude);
+                Log.d("緯度", "=" + latitude);
+                LatLng Search = new LatLng(latitude, longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 15));
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    public void voice(View view){
+        if(!voiceopen){
+            //開啟聲控
+            voiceopen = true;
+            Toast toast = Toast.makeText(this, "Open voice control", Toast.LENGTH_SHORT);
+            toast.show();
+            recognizer.startListening(intent);
+        }else{
+            //關閉聲控
+            voiceopen = false;
+            Toast toast = Toast.makeText(this, "Close voice control", Toast.LENGTH_SHORT);
+            toast.show();
+            recognizer.stopListening();
         }
     }
 
     public void live_button(View view) {
-        String url1 = "rtmp://140.115.158.81:1935/live/";
-        Toast toast = Toast.makeText(this, "Add a new marker", Toast.LENGTH_SHORT);
-        toast.show();
-        LocationManager locationManager =
-                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        // 設定標準為存取精確
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
-        String provider = locationManager.getBestProvider(criteria, true);
-        //noinspection MissingPermission
-        Location location = locationManager.getLastKnownLocation("network");
-        if (location != null) {
-            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
-            mMap.addMarker(new MarkerOptions()
-                    .position(Now)
-                    .title("Current Position"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
-        }
-        liverand = "marker"+rand;
-        url1=url1+liverand;
-        Log.d("bg", url1);
-        String method="register";
-        String longitude = String.valueOf(location.getLongitude());
-        String latitude = String.valueOf(location.getLatitude());
-        BackgroundTask backgroundTask=new BackgroundTask(this);
-        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
-        Log.d("janices", "in back 2");
-        //連結到camera
-
-        Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("url", url1);
-        Log.d("janices", "in back 3");
-        startActivity(intent);
+        live();
     }
-
 
     //解析JSON資料
     private ArrayList<Transaction> parseJSON(String s) {
@@ -428,12 +416,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Do something here on the main thread
             int i = 0;
             while (true) {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mMap.clear();
-//                    }
-//                });
                 String result = null;
                 try {
                     result = getJSONObjectFromURL(json_url);
@@ -544,56 +526,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public class TalkTask extends AsyncTask<String, Void, Void>
-    {
-        protected Void doInBackground(String... params) //背景中做的事
-        {
-            Log.d("timmy", "in back");
-            String reg_url = "http://140.115.158.81/project/talk.php";
-            String talk_get = params[0];
-            String rand_get=params[1];
-            try {
-                Log.d("COCO", "in back 2");
-                URL url = new URL(reg_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                //　先取得HttpURLConnection urlConn = new URL("http://www.google.com").openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
-                OutputStream os = httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                Log.d("timmy", "in back 3");
-                String data =  URLEncoder.encode("rand","UTF-8")+"="+URLEncoder.encode(rand_get,"UTF-8")+"&"+URLEncoder.encode("talk", "UTF-8") + "=" + URLEncoder.encode(talk_get, "UTF-8");
-                Log.d("timmy", "in back 4");
-                //&在php中表示下一個表單欄位的開始
-                bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。
-                bufferedWriter.flush();//flush();將緩衝數據寫到文件去
-                bufferedWriter.close();
-                os.close();
-                InputStream IS = httpURLConnection.getInputStream();
-                IS.close();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return  null;
-        }
-
-        @Override
-        protected void  onPreExecute() //AsyncTask 執行時會 第一個被呼叫的
-        {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values)//會以 Void 的型態回報進度
-        {
-            super.onProgressUpdate(values);
-        }
-    }
    public void delete (View v)
     {
         talkadd = false;
@@ -602,55 +534,121 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String delfix=fixrand;
         deleteTask.executeOnExecutor(THREAD_POOL_EXECUTOR,dellive,delfix);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
     }
-    public class DeleteTask extends AsyncTask<String, Void, Void>
-    {
-        protected Void doInBackground(String... params) //背景中做的事
-        {
-            Log.d("janice", "in back");
-            String reg_url = "http://140.115.158.81/project/delete.php";
-            String liverand_get = params[0];
-            String fixrand_get=params[1];
-            try {
-                Log.d("janice", "in back 2");
-                URL url = new URL(reg_url);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                //　先取得HttpURLConnection urlConn = new URL("http://www.google.com").openConnection();
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
-                OutputStream os = httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                Log.d("timmy", "in back 3");
-                String data =  URLEncoder.encode("liverand","UTF-8")+"="+URLEncoder.encode(liverand_get,"UTF-8")+"&"+URLEncoder.encode("fixrand", "UTF-8") + "=" + URLEncoder.encode(fixrand_get, "UTF-8");
-                Log.d("timmy", "in back 4");
-                //&在php中表示下一個表單欄位的開始
-                bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。
-                bufferedWriter.flush();//flush();將緩衝數據寫到文件去
-                bufferedWriter.close();
-                os.close();
-                InputStream IS = httpURLConnection.getInputStream();
-                IS.close();
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+    public class LiveTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d("COCO","livestart001");
+            while (true){
+                if(livestart) {
+                    Log.d("COCO", "livestart");
+                    livestart = false;
+                    publishProgress();
+                }
             }
-            return  null;
+        }
+
+        protected void onProgressUpdate(Void... voids){
+            Log.d("COCO","livestart2");
+            live();
+        }
+    }
+
+    //聲控
+    private class MyRecognizerListener implements RecognitionListener {
+
+        @Override
+        public void onResults(Bundle results) {
+            List <String>resList = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            if(resList.get(0).equals("開啟直播") || resList.get(0).equals("start live")) {
+                //TODO
+                Log.d("COCO","livestart000");
+                livestart = true;
+            }
         }
 
         @Override
-        protected void  onPreExecute() //AsyncTask 執行時會 第一個被呼叫的
-        {
-            super.onPreExecute();
+        public void onError(int error) {
+
         }
 
         @Override
-        protected void onProgressUpdate(Void... values)//會以 Void 的型態回報進度
-        {
-            super.onProgressUpdate(values);
+        public void onReadyForSpeech(Bundle params) {
         }
+
+        @Override
+        public void onBeginningOfSpeech() {
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+        }
+
+        @Override
+        public void onBufferReceived(byte[] buffer) {
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recognizer.startListening(intent);
+                }
+            }, 1000);
+        }
+
+        @Override
+        public void onPartialResults(Bundle partialResults) {
+        }
+
+        @Override
+        public void onEvent(int eventType, Bundle params) {
+        }
+    }
+
+    public void live(){
+        Log.d("COCO","livestart3");
+        String url1 = "rtmp://140.115.158.81:1935/live/";
+        Toast toast = Toast.makeText(this, "Add a new marker", Toast.LENGTH_SHORT);
+        toast.show();
+        LocationManager locationManager =
+                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        // 設定標準為存取精確
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
+        String provider = locationManager.getBestProvider(criteria, true);
+        //noinspection MissingPermission
+        Location location = locationManager.getLastKnownLocation("network");
+        if (location != null) {
+            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(Now)
+                    .title("Current Position"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
+        }
+        liverand = "marker"+rand;
+        url1=url1+liverand;
+        Log.d("bg", url1);
+        String method="register";
+        String longitude = String.valueOf(location.getLongitude());
+        String latitude = String.valueOf(location.getLatitude());
+        BackgroundTask backgroundTask=new BackgroundTask(this);
+        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        Log.d("janices", "in back 2");
+        //連結到camera
+
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra("url", url1);
+        Log.d("janices", "in back 3");
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
 

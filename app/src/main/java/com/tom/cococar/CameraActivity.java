@@ -436,46 +436,48 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             createLocationRequest();
             while (true){
                 location = setupMyLocation();
-                latitude = String.valueOf(location.getLatitude());
-                longitude = String.valueOf(location.getLongitude());
+                if(location != null) {
+                    latitude = String.valueOf(location.getLatitude());
+                    longitude = String.valueOf(location.getLongitude());
 
-                try {
-                    URL url=new URL(reg_url);
-                    HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
-                    //　先取得HttpURLConnection urlConn = new URL("http://www.google.com").openConnection();
-                    httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
-                    OutputStream os =httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
-                    BufferedWriter bufferedWriter=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-                    Log.d("COCO","in back 3");
-                    //InputStreamReader 與 OutputStreamWriter 類別屬於「由 byte 轉成 char」的
-                    // 中繼接頭。舉例來說，在處理資料輸入時，資料輸出的 outputStream 像是小口徑的水管
-                    // ，而我們希望能將小水管轉換為大口徑的 Bufferedwriter 這類大水管時，可利用 outputStreamWriter 這類轉換器，將 outStream 轉換為 Writer，
-                    //更多http解說:  https://litotom.com/2016/05/11/java%E7%9A%84%E7%B6%B2%E8%B7%AF%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88/
-                    String data=
-                            URLEncoder.encode("longitude","UTF-8")+"="+URLEncoder.encode(longitude,"UTF-8")+"&"+
-                            URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(latitude,"UTF-8")+"&"+
-                            URLEncoder.encode("url","UTF-8")+"="+URLEncoder.encode(s[0],"UTF-8");
-                    Log.d("COCO","in back 4");
-                    //&在php中表示下一個表單欄位的開始
-                    bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。
-                    bufferedWriter.flush();//flush();將緩衝數據寫到文件去
-                    bufferedWriter.close();
-                    os.close();
-                    InputStream IS=httpURLConnection.getInputStream();
-                    IS.close();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        URL url = new URL(reg_url);
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                        //　先取得HttpURLConnection urlConn = new URL("http://www.google.com").openConnection();
+                        httpURLConnection.setRequestMethod("POST");
+                        httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
+                        OutputStream os = httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
+                        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                        Log.d("COCO", "in back 3");
+                        //InputStreamReader 與 OutputStreamWriter 類別屬於「由 byte 轉成 char」的
+                        // 中繼接頭。舉例來說，在處理資料輸入時，資料輸出的 outputStream 像是小口徑的水管
+                        // ，而我們希望能將小水管轉換為大口徑的 Bufferedwriter 這類大水管時，可利用 outputStreamWriter 這類轉換器，將 outStream 轉換為 Writer，
+                        //更多http解說:  https://litotom.com/2016/05/11/java%E7%9A%84%E7%B6%B2%E8%B7%AF%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88/
+                        String data =
+                                URLEncoder.encode("longitude", "UTF-8") + "=" + URLEncoder.encode(longitude, "UTF-8") + "&" +
+                                        URLEncoder.encode("latitude", "UTF-8") + "=" + URLEncoder.encode(latitude, "UTF-8") + "&" +
+                                        URLEncoder.encode("url", "UTF-8") + "=" + URLEncoder.encode(s[0], "UTF-8");
+                        Log.d("COCO", "in back 4");
+                        //&在php中表示下一個表單欄位的開始
+                        bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。
+                        bufferedWriter.flush();//flush();將緩衝數據寫到文件去
+                        bufferedWriter.close();
+                        os.close();
+                        InputStream IS = httpURLConnection.getInputStream();
+                        IS.close();
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (ProtocolException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 

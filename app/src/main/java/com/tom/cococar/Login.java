@@ -24,6 +24,7 @@ import com.facebook.login.widget.LoginButton;
 import java.util.Arrays;
 
 import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.RECORD_AUDIO;
 
 public class Login extends AppCompatActivity {
     LoginButton loginButton;
@@ -35,6 +36,7 @@ public class Login extends AppCompatActivity {
     //權限變數
     private static final int REQUEST_LOCATION = 2;
     private static final int REQUEST_CAMERA = 3;
+    private static final int REQUEST_AUDIO = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,27 @@ public class Login extends AppCompatActivity {
         //位置權限
         int permission_2 = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         int permission_3 = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+        //聲控權限
+        int permission_4 = ActivityCompat.checkSelfPermission(this, RECORD_AUDIO);
+
         if (permission_1 != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
             ActivityCompat.requestPermissions(
                     this,
                     new String[]{CAMERA},
                     REQUEST_CAMERA
+            );
+        } else {
+            //已有權限，執行程式
+        }
+
+        //聲控權限
+        if (permission_4 != PackageManager.PERMISSION_GRANTED) {
+            // 無權限，向使用者請求
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{ RECORD_AUDIO },
+                    REQUEST_AUDIO
             );
         } else {
             //已有權限，執行程式
