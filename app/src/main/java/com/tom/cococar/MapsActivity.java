@@ -293,9 +293,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("經度", "=" + longitude);
                 Log.d("緯度", "=" + latitude);
                 LatLng Search = new LatLng(latitude, longitude);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 15));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 18));
             } catch (IOException e) {
             }
+            e_address.getText().clear();
         }
     }
 
@@ -524,7 +525,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String w=edtalk.getText().toString();
         TalkTask talkTask=new TalkTask();
         talkTask.executeOnExecutor(THREAD_POOL_EXECUTOR,w,fixrand);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
-
+        edtalk.getText().clear();
     }
 
    public void delete (View v)
