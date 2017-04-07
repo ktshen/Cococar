@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -89,6 +91,17 @@ public class Login extends AppCompatActivity {
         e_id= (EditText) findViewById(R.id.enterid);
         loginButton = (LoginButton) findViewById(R.id.fb_login_bn);
         callbackManager=CallbackManager.Factory.create();
+
+        if(AccessToken.getCurrentAccessToken() != null){
+            Log.d("COCO","facebook already logged in");
+            Profile profile = Profile.getCurrentProfile();
+            facebookid = profile.getName();
+            Toast toast = Toast.makeText(this, "Log in by Facebook : "+facebookid, Toast.LENGTH_SHORT);
+            toast.show();
+            Log.d("COCO","access"+facebookid);
+            goMainScreen();
+        }
+
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             private ProfileTracker mProfileTracker;
             @Override
@@ -113,12 +126,8 @@ public class Login extends AppCompatActivity {
                     facebookid = profile1.getName();
                     goMainScreen();
                 }
-//                Profile profile = Profile.getCurrentProfile();
-//                facebookid = profile1.getName();
                 Log.d("facebook","coco" );
-//                facebookid=loginResult.getAccessToken().getUserId();
                 Log.i("facebook",facebookid );
-//                goMainScreen();
             }
 
             @Override
@@ -150,6 +159,8 @@ public class Login extends AppCompatActivity {
     }
    public void enter(View v){
        String w =e_id.getText().toString();
+       Toast toast = Toast.makeText(this, "Log in by ID : "+w, Toast.LENGTH_SHORT);
+       toast.show();
        Intent intent;
        intent = new Intent(this, MapsActivity.class);
        intent.putExtra("id",w);

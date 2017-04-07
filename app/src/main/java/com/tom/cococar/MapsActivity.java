@@ -31,6 +31,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -183,29 +185,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        switch (requestCode) {
-//            case REQUEST_LOCATION:
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    // 使用者允許權限
-//                    //noinspection MissingPermission
-//                    setupMyLocation();
-//                } else {
-//                    // 使用者拒絕授權 , 停用 MyLocation 功能
-//                }
-//                break;
-//            case REQUEST_CAMERA:
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    // 使用者允許權限
-//                    //noinspection MissingPermission
-//                } else {
-//                    // 使用者拒絕授權 , 停用 MyLocation 功能
-//                }
-//                break;
-//        }
-//    }
-
     private void setupMyLocation() {
         //noinspection MissingPermission
         mMap.setMyLocationEnabled(true);
@@ -317,6 +296,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 15));
             } catch (IOException e) {
             }
+        }
+    }
+
+    //logout
+    public void log_out(View view){
+        if(AccessToken.getCurrentAccessToken() != null){
+            //登出FB
+            id = "id";
+            LoginManager.getInstance().logOut();
+            Toast toast = Toast.makeText(this, "Log Out", Toast.LENGTH_SHORT);
+            toast.show();
+            Intent intent;
+            intent = new Intent(this, Login.class);
+            startActivity(intent);
+        }else{
+            //跳回登入頁面
+            id = "id";
+            Toast toast = Toast.makeText(this, "Log Out", Toast.LENGTH_SHORT);
+            toast.show();
+            Intent intent;
+            intent = new Intent(this, Login.class);
+            startActivity(intent);
         }
     }
 
@@ -596,7 +597,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void run() {
                     recognizer.startListening(intent);
                 }
-            }, 1000);
+            }, 500);
         }
 
         @Override
