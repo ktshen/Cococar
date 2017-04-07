@@ -1,1 +1,1 @@
-include ':app', ':yasea'
+include ':app', ':yasea', ':ijkplayer-java', ':giraffeplayer'

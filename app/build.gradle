@@ -5,7 +5,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "com.tom.mapexample"
+        applicationId "com.tom.cococar"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -25,12 +25,15 @@ repositories {
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
+    compile project(':yasea')
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.android.support:design:23.3.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.facebook.android:facebook-android-sdk:4.14.0'
-    compile project(':yasea')
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
+    compile project(':giraffeplayer')
+    compile project(':ijkplayer-java')
 }
