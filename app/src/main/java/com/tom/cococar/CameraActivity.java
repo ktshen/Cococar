@@ -117,33 +117,56 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         mPublisher.setRtmpHandler(new RtmpHandler(this));
         mPublisher.setRecordHandler(new SrsRecordHandler(this));
 
+        rtmpUrl = efu.getText().toString();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("rtmpUrl", rtmpUrl);
+        editor.apply();
+
+        mPublisher.setPreviewResolution(1280, 720);
+        mPublisher.setOutputResolution(384, 640);
+        mPublisher.setVideoSmoothMode();
+        mPublisher.startPublish(rtmpUrl);
+
+        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+        }
+        btnPublish.setText("stop");
+        btnSwitchEncoder.setEnabled(false);
+
         btnPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnPublish.getText().toString().contentEquals("publish")) {
-                    rtmpUrl = efu.getText().toString();
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("rtmpUrl", rtmpUrl);
-                    editor.apply();
-
-                    mPublisher.setPreviewResolution(1280, 720);
-                    mPublisher.setOutputResolution(384, 640);
-                    mPublisher.setVideoSmoothMode();
-                    mPublisher.startPublish(rtmpUrl);
-
-                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
-                    }
-                    btnPublish.setText("stop");
-                    btnSwitchEncoder.setEnabled(false);
-                } else if (btnPublish.getText().toString().contentEquals("stop")) {
+//                if (btnPublish.getText().toString().contentEquals("publish")) {
+//                    rtmpUrl = efu.getText().toString();
+//                    SharedPreferences.Editor editor = sp.edit();
+//                    editor.putString("rtmpUrl", rtmpUrl);
+//                    editor.apply();
+//
+//                    mPublisher.setPreviewResolution(1280, 720);
+//                    mPublisher.setOutputResolution(384, 640);
+//                    mPublisher.setVideoSmoothMode();
+//                    mPublisher.startPublish(rtmpUrl);
+//
+//                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+//                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+//                    }
+//                    btnPublish.setText("stop");
+//                    btnSwitchEncoder.setEnabled(false);
+//                } else if (btnPublish.getText().toString().contentEquals("stop")) {
+                if(btnPublish.getText().toString().contentEquals("stop")){
                     mPublisher.stopPublish();
                     mPublisher.stopRecord();
                     btnPublish.setText("publish");
                     btnRecord.setText("record");
                     btnSwitchEncoder.setEnabled(true);
+                    //回到地圖
+                    Intent intent;
+                    intent = new Intent(CameraActivity.this, MapsActivity.class);
+                    startActivity(intent);
                 }
             }
         });
