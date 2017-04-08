@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class Login extends AppCompatActivity {
     LoginButton loginButton;
@@ -36,9 +37,7 @@ public class Login extends AppCompatActivity {
     private EditText e_id;
 
     //權限變數
-    private static final int REQUEST_LOCATION = 2;
-    private static final int REQUEST_CAMERA = 3;
-    private static final int REQUEST_AUDIO = 1;
+    private static final int REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,38 +49,18 @@ public class Login extends AppCompatActivity {
         int permission_3 = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         //聲控權限
         int permission_4 = ActivityCompat.checkSelfPermission(this, RECORD_AUDIO);
+        //存取權限
+        int permission_5 = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
 
-        if (permission_1 != PackageManager.PERMISSION_GRANTED) {
+        if (permission_1 != PackageManager.PERMISSION_GRANTED && permission_4 != PackageManager.PERMISSION_GRANTED && permission_2 != PackageManager.PERMISSION_GRANTED && permission_3 != PackageManager.PERMISSION_GRANTED && permission_5 != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
             ActivityCompat.requestPermissions(
                     this,
-                    new String[]{CAMERA},
-                    REQUEST_CAMERA
+                    new String[]{CAMERA, RECORD_AUDIO, WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST
             );
         } else {
             //已有權限，執行程式
-        }
-
-        //聲控權限
-        if (permission_4 != PackageManager.PERMISSION_GRANTED) {
-            // 無權限，向使用者請求
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{ RECORD_AUDIO },
-                    REQUEST_AUDIO
-            );
-        } else {
-            //已有權限，執行程式
-        }
-
-        //位置權限
-        if (permission_2 != PackageManager.PERMISSION_GRANTED && permission_3 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
-        } else {
-            //有權限
         }
 
         super.onCreate(savedInstanceState);

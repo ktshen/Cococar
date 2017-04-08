@@ -49,6 +49,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +59,8 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 
     private static final String TAG = "Yasea";
 
+    public Date d = new Date();
+
     Button btnPublish = null;
     Button btnSwitchCamera = null;
     Button btnRecord = null;
@@ -65,7 +68,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 
     private SharedPreferences sp;
     private String rtmpUrl = "rtmp://ossrs.net/" + getRandomAlphaString(3) + '/' + getRandomAlphaDigitString(5);
-    private String recPath = Environment.getExternalStorageDirectory().getPath() + "/test.mp4";
+    private String recPath = Environment.getExternalStorageDirectory().getPath() + "/" + d.toString() + ".mp4";
     String value="";
     private SrsPublisher mPublisher;
 
