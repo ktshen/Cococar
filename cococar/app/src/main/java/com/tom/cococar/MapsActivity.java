@@ -638,7 +638,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String longitude = String.valueOf(location.getLongitude());
         String latitude = String.valueOf(location.getLatitude());
         BackgroundTask backgroundTask=new BackgroundTask(this);
-        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url1);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
         Log.d("janices", "in back 2");
         //連結到camera
 
