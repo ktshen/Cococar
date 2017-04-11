@@ -51,12 +51,14 @@ coverage.xml
 *.log
 *.pot
 
-
 # VIM
 *~
 
 #redis
 *.rdb
+
+#pid file
+*.pid
 
 
 
