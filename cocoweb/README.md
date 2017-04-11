@@ -1,4 +1,4 @@
-###Note before starting
+### Note before starting
 #### Copy the code below to /usr/local/nginx/conf/nginx.conf
 ````
 server {
