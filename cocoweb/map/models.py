@@ -13,7 +13,7 @@ class Marker(models.Model):
     talk = models.CharField(max_length=30, blank=True)
     create = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True, null=True)
-    live_ending_time = models.DateTimeField(null=True)
+    live_ending_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.marker_id
@@ -24,11 +24,3 @@ class GPSInfo(models.Model):
     longitude = models.CharField(max_length=50)
     latitude = models.CharField(max_length=50)
     create = models.DateTimeField(auto_now_add=True)
-
-
-a = {"user_id": "bruce",
-    "url": "rtmp://123.123",
-    "talk":"YOYOYOYO",
-    "marker_id":"marker-123",
-    "longitude": "121.044",
-    "latitude": "25.363"}
