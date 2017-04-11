@@ -29,7 +29,7 @@ def video(request):
 @csrf_exempt
 def request_marker(request):
     if request.method == "POST":
-        rc = request
+        rc = json.loads(request.body)
         marker_id = rc.get("marker_id")
         if marker_id is None:
             return HttpResponse(status=400)
