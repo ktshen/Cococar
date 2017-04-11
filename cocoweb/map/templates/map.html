@@ -13,6 +13,7 @@
         margin: 0;
         padding: 0;
       }
+      .gm-style-iw + div {display: none;}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&callback=initMap"
     async defer></script>
@@ -59,7 +60,7 @@
         function initMap(){
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 24.968553, lng: 121.190186},
-              zoom: 10
+              zoom: 15
             });
         }
 
@@ -78,27 +79,45 @@
                     //Create or edit markers with setting its position
                     var m_copy = Object.keys(markers);
                     for(var i=0; i<data.length; i++){
-                        marker_id = data[i]["marker_id"];
+                        var marker_id = data[i]["marker_id"];
+                        var user_id = data[i]["user_id"] || "";
+                        var talk = data[i]["talk"] || "";
                         var p = new google.maps.LatLng(
                                 parseFloat(data[i]["latitude"]),
                                 parseFloat(data[i]["longitude"])
                             );
-                        var m;
+                        var mk;
                         if(marker_id in markers){
-                            m = markers[marker_id];
-                            m.setPosition(p);
+                            mk = markers[marker_id];
+                            mk.setPosition(p);
                             var index = m_copy.indexOf(marker_id);
                             if (index > -1) {
                                 m_copy.splice(index, 1);
                             }
                         }
                         else{
-                            m = new google.maps.Marker({
+                            mk = new google.maps.Marker({
                                 map: map,
                                 position:p
                             });
-                            markers[marker_id] = m;
+                            markers[marker_id] = mk;
                         }
+
+
+                        var info =  '<h4>' + user_id + '</h4>'+
+                                    '<div">'+
+                                        '<p>'+ talk +'</p>'+
+                                    '</div>';
+
+                        var infowindow = new google.maps.InfoWindow({
+                            content: info
+                        });
+                        mk.addListener('mouseover', function() {
+                            infowindow.open(map, mk);
+                        });
+                        mk.addListener('mouseout', function(){
+                            infowindow.close();
+                        });
                     }
                     //If a marker's id is not received after get method, then remove it
                     m_copy.forEach(function(marker_id){
