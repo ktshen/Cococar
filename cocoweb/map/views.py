@@ -29,18 +29,24 @@ def video(request):
 @csrf_exempt
 def request_marker(request):
     if request.method == "POST":
-        rc = json.loads(request.body)
+        rc = request
         marker_id = rc.get("marker_id")
         if marker_id is None:
             return HttpResponse(status=400)
-        if "live_finish" in rc.keys():
-            try:
-                marker = Marker.objects.get(marker_id=marker_id)
-            except Marker.DoesNotExist:
-                return HttpResponse(status=400)
-            marker.live_ending_time = timezone.now()
-            marker.save()
-            return HttpResponse(status=200)
+        if "message" in rc.keys():
+            if rc["message"] == "stop_live":
+                try:
+                    marker = Marker.objects.get(marker_id=marker_id)
+                except Marker.DoesNotExist:
+                    return HttpResponse(status=400)
+                marker.live_ending_time = timezone.now()
+                marker.save()
+            elif rc["message"] == "delete":
+                try:
+                    marker = Marker.objects.get(marker_id=marker_id)
+                    marker.delete()
+                except Marker.DoesNotExist:
+                    return HttpResponse(status=400)
         else:
             marker_id = rc.get("marker_id")
             marker = Marker.objects.get_or_create(marker_id=marker_id)[0]
@@ -51,7 +57,7 @@ def request_marker(request):
                 gps = GPSInfo(marker=marker, latitude=rc["latitude"], longitude=rc["longitude"])
                 gps.save()
             marker.save()
-            return HttpResponse(status=200)
+        return HttpResponse(status=200)
     else:
         queryset = Marker.objects.filter(marker_id__istartswith="marker") \
                                  .filter(create__gte=timezone.now() - datetime.timedelta(hours=1))

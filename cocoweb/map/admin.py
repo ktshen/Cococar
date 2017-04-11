@@ -21,10 +21,16 @@ class MarkerModelAdmin(admin.ModelAdmin):
     search_fields = ["user_id", "gps__longitude", "gps__latitude"]
 
     def last_longitude(self, obj):
-        return obj.gps.order_by('-create')[0].longitude
+        if obj.gps.order_by('-create') is None:
+            return ''
+        else:
+            return obj.gps.order_by('-create')[0].longitude
 
     def last_latitude(self, obj):
-        return obj.gps.order_by('-create')[0].latitude
+        if obj.gps.order_by('-create') is None:
+            return ''
+        else:
+            return obj.gps.order_by('-create')[0].latitude
 
 admin.site.register(Marker, MarkerModelAdmin)
 
