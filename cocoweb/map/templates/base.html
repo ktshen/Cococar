@@ -42,45 +42,13 @@
 
 <body>
 
-    <!-- Navigation -->
-    <a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>
-    <nav id="sidebar-wrapper">
-        <ul class="sidebar-nav">
-            <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
-            <li class="sidebar-brand">
-                <a href="{% url "map:map-home" %}" onclick=$("#menu-close").click();>Cococar</a>
-            </li>
-            <li>
-                <a href="{% url "map:map-home" %}" onclick=$("#menu-close").click();>Home</a>
-            </li>
-            <li>
-                <a href="{% url "map:search_record" %}" onclick=$("#menu-close").click();>Search for Record</a>
-            </li>
-            <li>
-                <a href="{% url "map:about" %}" onclick=$("#menu-close").click();>About</a>
-            </li>
-        </ul>
-    </nav>
-
     {% block content %}
-
     {% endblock %}
-
-
 
 
     <!-- Custom Theme JavaScript -->
     <script>
-    // Closes the sidebar menu
-    $("#menu-close").click(function(e) {
-        e.preventDefault();
-        $("#sidebar-wrapper").toggleClass("active");
-    });
-    // Opens the sidebar menu
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#sidebar-wrapper").toggleClass("active");
-    });
+
     // Scrolls to the selected menu item on the page
     $(function() {
         $('a[href*=#]:not([href=#],[data-toggle],[data-target],[data-slide])').click(function() {

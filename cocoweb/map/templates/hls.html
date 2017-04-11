@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+    <script src="{% static "js/hls.min.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <section id="hls" class="hls">
+        <div class="container">
+            <div class="row">
+                <h2>Cococar</h2>
+                <hr class="big">
+                <div class="col-lg-10 col-lg-offset-1 text-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="portfolio-item">
+                                <video id="video" width="720" height="405" controls > </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+      if(Hls.isSupported()) {
+        var video = document.getElementById('video');
+        var hls = new Hls();
+        hls.loadSource("{{ hls_url }}");
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+        });
+      }
+    </script>
+{% endblock %}

@@ -21,6 +21,10 @@ def about(request):
 def search_record(request):
     pass
 
+def video(request):
+    url = None
+    return render(request, "hls.html", context={"hls_url": url})
+
 
 @csrf_exempt
 def request_marker(request):
