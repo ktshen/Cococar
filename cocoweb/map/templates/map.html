@@ -78,6 +78,7 @@
                 function(data){
                     //Create or edit markers with setting its position
                     var m_copy = Object.keys(markers);
+                    var infowindow = new google.maps.InfoWindow();
                     for(var i=0; i<data.length; i++){
                         var marker_id = data[i]["marker_id"];
                         var user_id = data[i]["user_id"] || "";
@@ -102,17 +103,14 @@
                             });
                             markers[marker_id] = mk;
                         }
-
-
                         var info =  '<h4>' + user_id + '</h4>'+
                                     '<div">'+
                                         '<p>'+ talk +'</p>'+
                                     '</div>';
 
-                        var infowindow = new google.maps.InfoWindow({
-                            content: info
-                        });
+
                         mk.addListener('mouseover', function() {
+                            infowindow.setContent(info)
                             infowindow.open(map, mk);
                         });
                         mk.addListener('mouseout', function(){
