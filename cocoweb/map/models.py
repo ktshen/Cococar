@@ -9,8 +9,6 @@ from django.db import models
 class Marker(models.Model):
     user_id = models.CharField(max_length=50)
     marker_id = models.CharField(max_length=50)
-    longitude = models.CharField(max_length=50, blank=True)
-    latitude = models.CharField(max_length=50, blank=True)
     url = models.CharField(max_length=50, blank=True)
     talk = models.CharField(max_length=30, blank=True)
     create = models.DateTimeField(auto_now_add=True)
@@ -19,3 +17,18 @@ class Marker(models.Model):
 
     def __str__(self):
         return self.marker_id
+
+
+class GPSInfo(models.Model):
+    marker = models.ForeignKey(Marker, on_delete=models.CASCADE, related_name="gps")
+    longitude = models.CharField(max_length=50)
+    latitude = models.CharField(max_length=50)
+    create = models.DateTimeField(auto_now_add=True)
+
+
+a = {"user_id": "bruce",
+    "url": "rtmp://123.123",
+    "talk":"YOYOYOYO",
+    "marker_id":"marker-123",
+    "longitude": "121.044",
+    "latitude": "25.363"}

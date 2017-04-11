@@ -14,19 +14,69 @@
         padding: 0;
       }
     </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&callback=initMap"
+    async defer></script>
 {% endblock %}
 
 {% block content %}
      <div id="map"></div>
     <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 24.968553, lng: 121.190186},
-          zoom: 15
+        var map;
+        var markers = {};
+        function initMap(){
+            map = new google.maps.Map(document.getElementById('map'), {
+              center: {lat: 24.968553, lng: 121.190186},
+              zoom: 10
+            });
+        }
+
+        $(document).ready(function(){
+            setInterval(function(){
+                if(map !== undefined){
+                    getMarkers();
+                }
+            }, 3000);
+
         });
-      }
+
+        function getMarkers(){
+            $.getJSON("{% url "map:map-marker" %}",
+                function(data){
+                    //Create or edit markers with setting its position
+                    var m_copy = Object.keys(markers);
+                    for(var i=0; i<data.length; i++){
+                        marker_id = data[i]["marker_id"];
+                        var p = new google.maps.LatLng(
+                                parseFloat(data[i]["latitude"]),
+                                parseFloat(data[i]["longitude"])
+                            );
+                        var m;
+                        if(marker_id in markers){
+                            m = markers[marker_id];
+                            m.setPosition(p);
+                            var index = m_copy.indexOf(marker_id);
+                            if (index > -1) {
+                                m_copy.splice(index, 1);
+                            }
+                        }
+                        else{
+                            m = new google.maps.Marker({
+                                map: map,
+                                position:p
+                            });
+                            markers[marker_id] = m;
+                        }
+                    }
+                    //If a marker's id is not received after get method, then remove it
+                    m_copy.forEach(function(marker_id){
+                        m = markers[marker_id];
+                        m.setMap(null);
+                        delete markers[marker_id];
+                    })
+                }
+            );
+        }
+
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&callback=initMap"
-    async defer></script>
+
 {% endblock %}
