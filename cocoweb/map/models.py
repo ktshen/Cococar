@@ -27,6 +27,6 @@ class GPSInfo(models.Model):
 
 
 class Talk(models.Model):
-    marker = models.ForeignKey(Marker, on_delete=models.CASCADE, related_name="gps")
-    talk = models.CharField(max_length=50)
+    marker = models.ForeignKey(Marker, on_delete=models.CASCADE, related_name="talk")
+    talk = models.CharField(max_length=200)
     create = models.DateTimeField(auto_now_add=True)

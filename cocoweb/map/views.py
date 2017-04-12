@@ -2,14 +2,18 @@
 from __future__ import unicode_literals
 import json
 import datetime
+import os
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import Marker, GPSInfo
 
+m3u8_base = "http://140.115.158.81/hls"
 
 # Create your views here.
+
+
 def home(request):
     return render(request, "map.html")
 
@@ -21,9 +25,12 @@ def about(request):
 def search_record(request):
     pass
 
+
+@csrf_exempt
 def video(request):
-    url = None
-    return render(request, "hls.html", context={"hls_url": url})
+    marker = request.POST["marker_id"]
+    m3u8_path = os.path.join(m3u8_base, marker, "index.m3u8")
+    return render(request, "hls.html", context={"hls_url": m3u8_path})
 
 
 @csrf_exempt
@@ -77,21 +84,33 @@ def request_marker(request):
                     "longitude": m.gps.order_by("-create")[0].longitude,
                     "latitude": m.gps.order_by("-create")[0].latitude,
                     "url": m.url,
-                    "talk": talk
+                    "talk": talk.talk
                 }
                 response.append(d)
         return JsonResponse(data=response, safe=False)
 
+
 @csrf_exempt
 def chatroom(request):
+    time_format = "%Y:%m:%d %H:%M:%S"
     if request.method == "POST":
         rc = json.loads(request.body)
-        marker_id = rc.get("marker_id")
-        m = Marker.objects.get(marker_id=marker_id)
-        room = m.talk.order_by('-create')
+        marker_id = rc.get("marker_id", None)
+        if marker_id is None:
+            return HttpResponse(status=400)
+        try:
+            m = Marker.objects.get(marker_id=marker_id)
+        except Marker.DoesNotExist:
+            return HttpResponse(status=400)
+        last_time = rc.get("time", None)
+        if last_time is None:
+            room = m.talk.order_by('-create')
+        else:
+            last_time = datetime.datetime.strptime(time_format)
+            room = m.talk.filter(create__gte=last_time).order_by('-create')
         response = []
         for c in room:
-            response.append([str(c.create), c.talk])
+            response.append([c.create.strftime(time_format), c.talk])
         return JsonResponse(data=response, safe=False)
 
 

@@ -1,7 +1,8 @@
 ### Note before starting
 #### Copy the code below to /usr/local/nginx/conf/nginx.conf
 ````
-server {
+http{
+    server {
         set $PATH /home/bruce/Cococar/cocoweb;
         listen 8000;
         location / {            
@@ -12,11 +13,36 @@ server {
         location /media  {
             alias $PATH/media;  
         }
-
+        
         location /static {
             alias $PATH/static;
-        }   
+        }
+        
+        location /hls {
+            root /tmp/hls
+            allow all;
+            add_header 'Access-Control-Allow-Origin' '*';
+        }
     }
+}
+
+rtmp {
+    server {
+        listen 1935;
+        chunk_size 4096;
+        allow publish all;
+        application live{
+            live on;
+            hls on;
+            hls_nested on;
+            hls_path /tmp/hls;
+            hls_fragment 2s;
+            hls_playlist_length 10s;
+            hls_cleanup off;
+    }
+}
+
+}
 ````
 
 #### Fire the website (current directory should be cocoweb)

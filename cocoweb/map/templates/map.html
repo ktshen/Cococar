@@ -13,7 +13,6 @@
         margin: 0;
         padding: 0;
       }
-      .gm-style-iw + div {display: none;}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&callback=initMap"
     async defer></script>
@@ -77,12 +76,17 @@
             $.getJSON("{% url "map:map-marker" %}",
                 function(data){
                     //Create or edit markers with setting its position
+                    // marker has two class, prefixed with "user" and "marker"
+                    //"user": has live streaming url
+                    //"marker": info window has chat room feature
+                    //Update each marker's info window, while clicking on the marker
                     var m_copy = Object.keys(markers);
                     for(var e=0; e<data.length; e++){
                         (function(i){
                             var marker_id = data[i]["marker_id"];
                             var user_id = data[i]["user_id"] || "";
                             var talk = data[i]["talk"] || "";
+                            // First Update Position
                             var p = new google.maps.LatLng(
                                     parseFloat(data[i]["latitude"]),
                                     parseFloat(data[i]["longitude"])
@@ -102,18 +106,40 @@
                                     position:p
                                 });
                                 markers[marker_id] = mk;
+                                if(marker_id.substring(0, 4) === "user"){
+                                    mk.addListener('click', function(){
+                                        var form = document.createElement('form');
+                                        form.method = 'post';
+                                        form.action = "{% url "map:video" %}";
+                                        var input = document.createElement('input');
+                                        input.type = 'hidden';
+                                        input.name = "marker_id";
+                                        input.value = marker_id;
+                                        form.appendChild(input);
+                                        form.submit();
+                                    })
+                                }
+                                else{
+                                    mk.addListener('click', function(){
+
+                                    })
+                                }
+
                             }
+                            // Update marker's info window. Listen on hovering mouse over the marker.
                             if(talk !== ""){
                                 var info =  '<h4>' + user_id + '</h4>'+
-                                        '<div">'+
-                                            '<p>'+ talk +'</p>'+
-                                        '</div>';
+                                            '<div">'+
+                                                '<p>'+ talk +'</p>'+
+                                            '</div>';
                                 var infowindow = new google.maps.InfoWindow({
                                     content:info
                                 });
-
-                                mk.addListener('mouseover', function(i) {
-                                    infowindow.setContent(info);
+                                infowindow.open(map, mk);
+                                setTimeout(function(){
+                                    infowindow.close()
+                                });
+                                mk.addListener('mouseover', function() {
                                     infowindow.open(map, mk);
                                 });
                                 mk.addListener('mouseout', function(){
