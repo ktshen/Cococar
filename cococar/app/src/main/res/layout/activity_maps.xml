@@ -16,7 +16,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Button
+    <ImageButton
         android:text="search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,9 +24,11 @@
         android:onClick="search"
         android:layout_above="@+id/submit"
         android:layout_alignLeft="@+id/delete"
-        android:layout_alignStart="@+id/delete" />
+        android:layout_alignStart="@+id/delete"
+        android:src="@drawable/searchen"
+        />
 
-    <Button
+    <ImageButton
         android:text="log out"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,19 +36,23 @@
         android:onClick="log_out"
         android:layout_below="@+id/save"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:src="@drawable/logouten"
+        />
 
-    <Button
+    <ImageButton
         android:text="voice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/voice"
         android:onClick="voice"
-        android:layout_below="@+id/button3"
+        android:layout_below="@+id/startlive"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:src="@drawable/voiceen"
+        />
 
-    <Button
+    <ImageButton
         android:text="save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,19 +60,24 @@
         android:onClick="save"
         android:layout_below="@+id/voice"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:src="@drawable/saveen"
 
-    <Button android:layout_width="wrap_content"
+        />
+
+    <ImageButton android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="start live"
         android:onClick="live_button"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/button3"
+        android:id="@+id/startlive"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:src="@drawable/liveen"
+        />
 
-    <Button
+    <ImageButton
         android:text="submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,9 +87,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="94dp"
-        android:layout_marginEnd="94dp" />
+        android:layout_marginEnd="94dp"
+        android:src="@drawable/submiten"
+        />
 
-    <Button
+    <ImageButton
         android:text="delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,14 +102,16 @@
         android:layout_alignBottom="@+id/submit"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:onClick="delete" />
+        android:onClick="delete"
+        android:src="@drawable/deleteen"
+        />
 
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:hint="say something..."
+        android:hint="@string/say_something"
         android:ems="10"
         android:layout_marginBottom="42dp"
         android:id="@+id/ed_talk"
@@ -111,7 +126,7 @@
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/address"
-        android:hint="address or location"
+        android:hint="@string/address_or_location"
         tools:text="address or location"
         android:layout_above="@+id/ed_talk"
         android:layout_alignParentLeft="true"

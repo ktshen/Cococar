@@ -37,6 +37,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -98,8 +99,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     boolean livestart = false;
     private EditText edtalk;
     private EditText e_address;
-    private Button submit;
-    private Button delete;
+    private ImageButton submit;
+    private ImageButton delete;
+    private ImageButton startlive;
+    private ImageButton save;
+    private ImageButton voice;
+    private ImageButton logout;
+    private ImageButton search;
     String liverand="";
     String fixrand="";
     String strAddress="";
@@ -117,14 +123,31 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String language= Locale.getDefault().getDisplayLanguage();
+        Log.d("language",language);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Intent intent=getIntent();
         id=intent.getStringExtra("id");
         e_address= (EditText) findViewById(R.id.address);
         edtalk = (EditText) findViewById(R.id.ed_talk);
-        submit = (Button) findViewById(R.id.submit);
-        delete=(Button)findViewById(R.id.delete);
+        submit = (ImageButton) findViewById(R.id.submit);
+        delete=(ImageButton)findViewById(R.id.delete);
+        save= (ImageButton) findViewById(R.id.save);
+        startlive= (ImageButton) findViewById(R.id.startlive);
+        voice= (ImageButton) findViewById(R.id.voice);
+        logout= (ImageButton) findViewById(R.id.logout);
+        search= (ImageButton) findViewById(R.id.search);
+        if(language.equals("中文")){
+            submit.setImageResource(R.drawable.submitch);
+            delete.setImageResource(R.drawable.deletech);
+            save.setImageResource(R.drawable.savech);
+            startlive.setImageResource(R.drawable.livech);
+            voice.setImageResource(R.drawable.voicech);
+            logout.setImageResource(R.drawable.logoutch);
+            search.setImageResource(R.drawable.searchch);
+        }
+
 
         //聲控
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);

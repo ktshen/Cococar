@@ -43,7 +43,7 @@
         android:layout_above="@+id/enterid"
         android:layout_alignLeft="@+id/enterid"
         android:layout_alignStart="@+id/enterid"
-        android:text="Please enter your ID:"
+        android:text="@string/please_enter_your_id"
         android:textColor="@drawable/papayawhip"
         android:textSize="18sp" />
 
