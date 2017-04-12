@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from .models import Marker, GPSInfo
+from .models import Marker, GPSInfo, Talk
 
 m3u8_base = "http://140.115.158.81/hls"
 
@@ -58,11 +58,14 @@ def request_marker(request):
             marker_id = rc.get("marker_id")
             marker = Marker.objects.get_or_create(marker_id=marker_id)[0]
             for key in rc.keys():
-                if key != "longitude" or key != "latitude":
+                if key != "longitude" or key != "latitude" or key !="talk":
                     setattr(marker, key, rc[key])
             if "longitude" in rc.keys() and "latitude" in rc.keys():
                 gps = GPSInfo(marker=marker, latitude=rc["latitude"], longitude=rc["longitude"])
                 gps.save()
+            if "talk" in rc.keys():
+                talk = Talk(marker=marker, talk=rc["talk"])
+                talk.save()
             marker.save()
         return HttpResponse(status=200)
     else:
