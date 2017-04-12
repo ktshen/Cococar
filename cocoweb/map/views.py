@@ -78,13 +78,15 @@ def request_marker(request):
                 talk = m.talk.order_by("-create").first()
                 if talk is None:
                     talk = " "
+                else:
+                    talk = talk.talk
                 d = {
                     "marker_id": m.marker_id,
                     "user_id": m.user_id,
                     "longitude": m.gps.order_by("-create")[0].longitude,
                     "latitude": m.gps.order_by("-create")[0].latitude,
                     "url": m.url,
-                    "talk": talk.talk
+                    "talk": talk
                 }
                 response.append(d)
         return JsonResponse(data=response, safe=False)
