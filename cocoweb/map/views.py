@@ -64,8 +64,9 @@ def request_marker(request):
                 gps = GPSInfo(marker=marker, latitude=rc["latitude"], longitude=rc["longitude"])
                 gps.save()
             if "talk" in rc.keys():
-                talk = Talk(marker=marker, talk=rc["talk"])
-                talk.save()
+                if rc["talk"] != " ":
+                    talk = Talk(marker=marker, talk=rc["talk"])
+                    talk.save()
             marker.save()
         return HttpResponse(status=200)
     else:
