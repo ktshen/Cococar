@@ -1,0 +1,17 @@
+
+{% for time, content in allchat %}
+    <li class="left clearfix">
+        <span class="chat-img pull-left"></span>
+        <div class="chat-body clearfix">
+            <div>
+                <small class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-time">{{ time }}</span>
+                </small>
+            </div>
+            <div>
+                <p>{{ content }}</p>
+            </div>
+
+        </div>
+    </li>
+{% endfor %}

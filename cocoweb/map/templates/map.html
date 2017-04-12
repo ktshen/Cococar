@@ -56,10 +56,13 @@
         //Google Map
         var map;
         var markers = {};
+        var markers_window = {};
+        // id, infowindow, interval_id
+        var chatroom_open = [];
         function initMap(){
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 24.968553, lng: 121.190186},
-              zoom: 15
+              zoom: 5
             });
         }
 
@@ -121,10 +124,18 @@
                                 }
                                 else{
                                     mk.addListener('click', function(){
-
+                                        if(chatroom_open[0] !== undefined && chatroom_open[0] !== marker_id){
+                                            chatroom_open[1].close();
+                                            clearInterval(chatroom_open[2]);
+                                            chatroom_open = []
+                                        }
+                                        // In case, click on the same marker twice
+                                        else if(chatroom_open[0] === marker_id){
+                                            return false;
+                                        }
+                                        setTimeout(fire_chatroom(marker_id, mk), 1000);
                                     })
                                 }
-
                             }
                             // Update marker's info window. Listen on hovering mouse over the marker.
                             if(talk !== ""){
@@ -132,19 +143,29 @@
                                             '<div">'+
                                                 '<p>'+ talk +'</p>'+
                                             '</div>';
-                                var infowindow = new google.maps.InfoWindow({
-                                    content:info
-                                });
-                                infowindow.open(map, mk);
-                                setTimeout(function(){
-                                    infowindow.close()
-                                });
-                                mk.addListener('mouseover', function() {
+                                var infowindow;
+                                if(!(marker_id in markers_window)){
+                                    infowindow = new google.maps.InfoWindow({
+                                        content:info
+                                    });
+                                    markers_window[marker_id] = infowindow;
+                                    mk.addListener('mouseover', function() {
+                                        infowindow.open(map, mk);
+                                    });
+                                    mk.addListener('mouseout', function(){
+                                        infowindow.close();
+                                    });
+                                }
+                                else if(markers_window[marker_id].getContent() !== info){
+                                    infowindow = markers_window[marker_id];
+                                    infowindow.setContent(info);
+                                }
+                                if(infowindow !== undefined && chatroom_open[0] !== marker_id){
                                     infowindow.open(map, mk);
-                                });
-                                mk.addListener('mouseout', function(){
-                                    infowindow.close();
-                                });
+                                    setTimeout(function(){
+                                        infowindow.close()
+                                    }, 3000);
+                                }
                             }
                         })(e);
                     }
@@ -153,10 +174,48 @@
                         m = markers[marker_id];
                         m.setMap(null);
                         delete markers[marker_id];
+                        delete markers_window[marker_id];
                     })
                 }
             );
         }
+
+        function fire_chatroom(marker_id, mk){
+            var infowindow = new google.maps.InfoWindow();
+            $.post("{% url "map:chatroom" %}",
+                JSON.stringify({"marker_id": marker_id}),
+                function(data){
+                    infowindow.setContent(data["html"]);
+                    infowindow.open(map, mk);
+                    // post input message when the button is clicked
+                    $("div#chat-" + marker_id + " button#btn-chat").click(function(){
+                        var value = $("div#chat-" + marker_id +" input:text").val();
+                        $.post("{% url "map:map-marker" %}",
+                            JSON.stringify({"marker_id": marker_id, "talk": value}),
+                            function(){
+                                $("div#chat-" + marker_id +" input").val("");
+                            }
+                        )
+                    });
+                    var last_time = data["last_time"];
+                    var task = setInterval(function(){
+                        $.post("{% url "map:update-chat" %}",
+                            JSON.stringify({"marker_id": marker_id, "last_time": last_time}),
+                            function(data){
+                                if("html" in data){
+                                    $("div#chat-" + marker_id +"  ul.chat").append(data["html"]);
+                                    last_time = data["last_time"];
+                                }
+                        })
+                    }, 1000);
+                    chatroom_open = [marker_id, infowindow, task];
+                    infowindow.addListener('closeclick', function(){
+                        clearInterval(task);
+                    })
+                }
+            )
+        }
+
 
     </script>
 

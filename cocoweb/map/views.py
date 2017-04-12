@@ -3,13 +3,15 @@ from __future__ import unicode_literals
 import json
 import datetime
 import os
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import Marker, GPSInfo, Talk
 
 m3u8_base = "http://140.115.158.81/hls"
+time_format = "%Y:%m:%d %H:%M:%S"
 
 # Create your views here.
 
@@ -55,18 +57,16 @@ def request_marker(request):
                 except Marker.DoesNotExist:
                     return HttpResponse(status=400)
         else:
-            marker_id = rc.get("marker_id")
             marker = Marker.objects.get_or_create(marker_id=marker_id)[0]
             for key in rc.keys():
-                if key != "longitude" or key != "latitude" or key !="talk":
+                if key not in ["longitude", "latitude", "talk"]:
                     setattr(marker, key, rc[key])
             if "longitude" in rc.keys() and "latitude" in rc.keys():
                 gps = GPSInfo(marker=marker, latitude=rc["latitude"], longitude=rc["longitude"])
                 gps.save()
-            if "talk" in rc.keys():
-                if not rc["talk"]:
-                    talk = Talk(marker=marker, talk=rc["talk"])
-                    talk.save()
+            if "talk" in rc.keys() and rc["talk"]:
+                talk = Talk(marker=marker, talk=rc["talk"])
+                talk.save()
             marker.save()
         return HttpResponse(status=200)
     else:
@@ -97,29 +97,49 @@ def request_marker(request):
 
 
 @csrf_exempt
-def chatroom(request):
-    time_format = "%Y:%m:%d %H:%M:%S"
-    if request.method == "POST":
+def fire_chatroom(request):
+    try:
         rc = json.loads(request.body)
-        marker_id = rc.get("marker_id", None)
-        if marker_id is None:
-            return HttpResponse(status=400)
-        try:
-            m = Marker.objects.get(marker_id=marker_id)
-        except Marker.DoesNotExist:
-            return HttpResponse(status=400)
-        last_time = rc.get("time", None)
-        if last_time is None:
-            room = m.talk.order_by('-create')
-        else:
-            last_time = datetime.datetime.strptime(time_format)
-            room = m.talk.filter(create__gte=last_time).order_by('-create')
+    except ValueError:
+        return HttpResponse(status=400)
+    marker_id = rc.get("marker_id", None)
+    if marker_id is None:
+        return HttpResponse(status=400)
+    m = get_object_or_404(Marker, marker_id=marker_id)
+    room = m.talk.order_by('create')
+    response = []
+    for c in room:
+        response.append([c.create.strftime(time_format), c.talk])
+    html = render_to_string("chatroom.html",
+                            {"allchat":response,
+                             "chat_id": "chat-"+marker_id})
+    d = {"html": html}
+    if room.last():
+        d["last_time"] = room.last().create.strftime(time_format)
+    return JsonResponse(data=d)
+
+
+@csrf_exempt
+def update_chatroom(request):
+    try:
+        rc = json.loads(request.body)
+    except ValueError:
+        return HttpResponse(status=400)
+    marker_id = rc.get("marker_id", None)
+    last_time = rc.get("last_time", None)
+
+    if not marker_id or not last_time:
+        return HttpResponse(status=400)
+    m = get_object_or_404(Marker, marker_id=marker_id)
+    last_time = datetime.datetime.strptime(last_time, time_format)
+    room = m.talk.filter(create__gte=last_time + datetime.timedelta(seconds=1)).order_by('create')
+    d = {}
+    if room.exists():
         response = []
         for c in room:
             response.append([c.create.strftime(time_format), c.talk])
-        return JsonResponse(data=response, safe=False)
-
-
-
-
+        d["html"] = render_to_string("chat.html", {"allchat": response})
+        if room.last():
+            d["last_time"] = room.last().create.strftime(time_format)
+    return JsonResponse(data=d)
 
