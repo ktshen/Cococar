@@ -1,3 +1,17 @@
+
+### Regulations
+#### Marker Prefix
+- user : moving marker, providing live streaming function
+- marker : Static point, providing chat room features
+
+#### exchanging json key naming
+- marker_id
+- user_id
+- talk
+- longitude
+- latitude
+- url : rtmp's url
+
 ### Note before starting
 #### Copy the code below to /usr/local/nginx/conf/nginx.conf
 ````
