@@ -23,7 +23,7 @@ public class TalkTask extends AsyncTask<String, Void, Void>
     protected Void doInBackground(String... params) //背景中做的事
     {
         Log.d("timmy", "in back");
-        String reg_url = "http://140.115.158.81/project/talk.php";
+        String reg_url = "http://140.115.158.81/cococar/marker";
         String talk_get = params[0];
         String rand_get=params[1];
         try {
@@ -36,7 +36,12 @@ public class TalkTask extends AsyncTask<String, Void, Void>
             OutputStream os = httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             Log.d("timmy", "in back 3");
-            String data =  URLEncoder.encode("rand","UTF-8")+"="+URLEncoder.encode(rand_get,"UTF-8")+"&"+URLEncoder.encode("talk", "UTF-8") + "=" + URLEncoder.encode(talk_get, "UTF-8");
+
+            String data = "{\"marker_id\":\"" + rand_get +
+                    "\", \"talk\": \"" + talk_get +
+                    "\"}";
+
+//            String data =  URLEncoder.encode("marker_id","UTF-8")+"="+URLEncoder.encode(rand_get,"UTF-8")+"&"+URLEncoder.encode("talk", "UTF-8") + "=" + URLEncoder.encode(talk_get, "UTF-8");
             Log.d("timmy", "in back 4");
             //&在php中表示下一個表單欄位的開始
             bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。

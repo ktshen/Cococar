@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/logout"
         android:onClick="log_out"
-        android:layout_below="@+id/voice"
+        android:layout_below="@+id/save"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -46,13 +46,25 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:text="save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/save"
+        android:onClick="save"
+        android:layout_below="@+id/voice"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <Button android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:text="start live"
         android:onClick="live_button"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/button3" />
+        android:id="@+id/button3"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:text="submit"
