@@ -40,12 +40,13 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/please_enter_your_id"
+        android:textColor="@drawable/papayawhip"
+        android:textSize="18sp"
         android:layout_above="@+id/enterid"
         android:layout_alignLeft="@+id/enterid"
         android:layout_alignStart="@+id/enterid"
-        android:text="@string/please_enter_your_id"
-        android:textColor="@drawable/papayawhip"
-        android:textSize="18sp" />
+        android:layout_marginBottom="13dp" />
 
     <ImageButton
         android:id="@+id/fuckyou"
