@@ -38,6 +38,7 @@
     </nav>
 
     <input id="pac-input" class="controls" type="text" placeholder="Search Location">
+    <div id="search-message" class="container"></div>
     <div id="map"></div>
 
     <script>
@@ -61,7 +62,7 @@
         function initMap(){
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 24.968553, lng: 121.190186},
-              zoom: 5
+              zoom: 8
             });
             // Create the search box and link it to the UI element.
             var input = document.getElementById('pac-input');
@@ -125,13 +126,101 @@
 
 
         $(document).ready(function(){
-            setInterval(function(){
-                if(map !== undefined){
-                    getMarkers();
-                }
-            }, 3000);
+            var update_id = setInterval(function(){
+                                if(map !== undefined){
+                                    getMarkers();
+                                }
+                            }, 3000);
+            $('#record_form').ajaxForm({
+                type: "POST",
+                dataType: "json",
+                success: function(data){
 
+                    console.log(data);
+
+                    $(this).clearForm();
+                    if(data["status"] === 1){
+                        $("#search-message").append(
+                            "<div class='alert alert-warning'><strong>Fail!</strong>"+data["message"]+"</div>"
+                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();})
+                    }
+                    else if (data["status"] === 2){
+                        $("#search-message").append(
+                            "<div class='alert alert-warning'><strong>Fail!</strong>"+data["message"]+"</div>"
+                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();});
+                    }
+                    else if (data["status"] === 0){
+                        $("#search-message").append(
+                            "<div class='alert alert-warning'><strong>Success!</strong>"+data["message"]+"</div>"
+                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();});
+                        $("#sidebar-wrapper").toggleClass("active");
+                        show_records(data);
+                    }
+                },
+                error:function(){
+                     $("#search-message").append(
+                            "<div class='alert alert-warning'><strong>Fail!</strong></div>"
+                     ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();})
+                }
+            });
+
+            function show_records(data){
+                //clear objects on map
+                clearInterval(update_id);
+                if(chatroom_open.length>0){
+                    chatroom_open[1].close()
+                }
+                for(var i in markers){
+                    markers[i].setMap(null);
+                }
+                //pin markers on map
+                var m;
+                for( m in data["matches"]){
+                    (function(match){
+                        var mk = new google.maps.Marker({
+                                map: map,
+                                position:new google.maps.LatLng(match["latitude"], match["longitude"]),
+                                icon: "{% static "img/point.png" %}"
+                            });
+                        var infowindow = new google.maps.InfoWindow({
+                                            content:match["marker_id"]
+                                        });
+                        mk.addListener('mouseover', function() {
+                            infowindow.open(map, mk);
+                        });
+                        mk.addListener('mouseout', function(){
+                            infowindow.close();
+                        });
+                    })(m);
+                }
+                for( m in data["records"]){
+                    (function(record){
+                        var mk = new google.maps.Marker({
+                                map: map,
+                                position:new google.maps.LatLng(record["latitude"], record["longitude"]),
+                                icon: "{% static "img/video.png" %}"
+                            });
+                        var info = "<h3>"+record["marker_id"]+'<h3><span class="glyphicon glyphicon-time"></span>'+record["time"];
+                        var infowindow = new google.maps.InfoWindow({
+                                            content:info
+                                        });
+                        mk.addListener('mouseover', function() {
+                            infowindow.open(map, mk);
+                        });
+                        mk.addListener('mouseout', function(){
+                            infowindow.close();
+                        });
+                        mk.addListener('click', function(){
+                            watch_video(record["marker_id"]);
+                        })
+                    })(m);
+                }
+                //if turn off button is click, then go to home
+                $("#search-message").append("<button type='button' href="+"{% url "map:map-home" %}"+"class='btn btn-primary'>Done</button>")
+            }
         });
+
+
 
         function getMarkers(){
             $.getJSON("{% url "map:map-marker" %}",
@@ -169,15 +258,7 @@
                                 markers[marker_id] = mk;
                                 if(marker_id.substring(0, 4) === "user"){
                                     mk.addListener('click', function(){
-                                        var form = document.createElement('form');
-                                        form.method = 'post';
-                                        form.action = "{% url "map:video" %}";
-                                        var input = document.createElement('input');
-                                        input.type = 'hidden';
-                                        input.name = "marker_id";
-                                        input.value = marker_id;
-                                        form.appendChild(input);
-                                        form.submit();
+                                        watch_video(marker_id);
                                     })
                                 }
                                 else{
@@ -258,9 +339,6 @@
                             }
                         )
                     });
-                    var t = '<div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..."> <span class="input-group-btn"> <button class="btn btn-warning btn-sm" id="btn-chat">Send</button> </span> </div> </div>';
-
-                    $("div .gm-style-lw").html("<p>shit</p>");
                     $("div#chat-"+marker_id+" input").keypress(function(e){
                         if(e.which === 13){
                             $("div#chat-" + marker_id + " button#btn-chat").click();
@@ -289,6 +367,18 @@
             )
         }
 
+        function watch_video(marker_id){
+            var form = document.createElement('form');
+            form.method = 'post';
+            form.action = "{% url "map:video" %}";
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = "marker_id";
+            input.value = marker_id;
+            form.appendChild(input);
+            form.submit();
+        }
+
         function scrolltobottom(marker_id){
             var v = $("div#chat-"+marker_id+" ul").height();
             $("div#chat-"+marker_id+" div.panel-body").scrollTop(v);
@@ -314,9 +404,9 @@
                 defaultDate: new Date()
             });
         });
-
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&libraries=places&language=zh-TW&callback=initMap"
     async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.1/jquery.form.min.js" integrity="sha384-tIwI8+qJdZBtYYCKwRkjxBGQVZS3gGozr3CtI+5JF/oL1JmPEHzCEnIKbDbLTCer" crossorigin="anonymous"></script>
 
 {% endblock %}

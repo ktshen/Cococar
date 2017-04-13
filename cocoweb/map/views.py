@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 import datetime
 import os
+import googlemaps
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
@@ -10,9 +11,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import Marker, GPSInfo, Talk
 from .forms import SearchForm
+from django.db.models import Q
 
+google_key = "AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY"
 m3u8_base = "http://140.115.158.81/hls"
 DATE_TIME_FORMAT = "%Y/%m/%d %H:%M:%S"
+SEARCH_TIME_FORMAT = "%Y/%m/%d %H:%M"
+# distance delta
+ddelta = 1.0
+
 
 # Create your views here.
 
@@ -24,8 +31,80 @@ def home(request):
 def about(request):
     return render(request, "about.html")
 
-def search_record(reqeust):
-    pass
+
+def search_record(request):
+    """
+    :return: 
+    - "status": 
+        - 0 : Found match records
+        - 1 : Wrong Location
+        - 2 : No match record
+    - "message"
+    - "matches"
+        - "latitude"
+        - "longitude"
+        - "marker_id"
+    - "records"
+        - "time"
+        - "latitude"
+        - "longitude"
+        - "marker_id"
+    """
+    # try:
+    print(request.POST)
+    loc = request.POST["location"][0]
+    st = datetime.datetime.strptime(str(request.POST["start_time"]), SEARCH_TIME_FORMAT)
+    et = datetime.datetime.strptime(str(request.POST["end_time"]), SEARCH_TIME_FORMAT)
+    try:
+        if st > et:
+            raise ValueError("Time Value is not right")
+    except:
+        return HttpResponse(status=400)
+    print("OK")
+    gmaps = googlemaps.Client(key=google_key)
+    m = "Successfully found some matches."
+    s = 0
+    geocode_result = gmaps.geocode(loc, language="zh-TW", components={"country": "TW"})
+    matches = []
+    records = []
+    for pt in geocode_result:
+        lat = pt["geometry"]["location"]["lat"]
+        lng = pt["geometry"]["location"]["lng"]
+        d = {
+            "latitude": lat,
+            "longitude": lng,
+            "marker_id": pt["address_components"][1]["long_name"] + " " + pt["address_components"][0]["long_name"]
+        }
+        matches.append(d)
+        result = GPSInfo.objects.filter(
+            Q(create__gte=st) &
+            Q(create__lte=et) &
+            Q(longitude__gte=lng - ddelta) &
+            Q(longitude__lte=lng + ddelta) &
+            Q(latitude__gte=lat - ddelta) &
+            Q(latitude__lte=lat + ddelta)
+        )
+        for gps in result:
+            d = {
+                "time": gps.create.strftime(DATE_TIME_FORMAT),
+                "latitude": gps.latitude,
+                "longitude": gps.longitude,
+                "marker_id": gps.marker.marker_id,
+            }
+            records.append(d)
+    if not len(geocode_result):
+        s = 1
+        m = "Unable to find expected location."
+    elif not len(records):
+        s = 2
+        m = "Can't find any records that match your search."
+    response = {
+        "status": s,
+        "message": m,
+        "matches": matches,
+        "records": records
+    }
+    return JsonResponse(data=response, safe=False)
 
 
 @csrf_exempt
@@ -70,12 +149,12 @@ def request_marker(request):
             marker.save()
         return HttpResponse(status=200)
     else:
-        queryset = Marker.objects.exclude(deleted=True)\
-                                 .filter(marker_id__istartswith="marker") \
-                                 .filter(create__gte=datetime.datetime.now() - datetime.timedelta(hours=2))
-        queryset2 = Marker.objects.exclude(deleted=True)\
-                                  .filter(marker_id__istartswith="user")\
-                                  .exclude(live_ending_time__isnull=False)
+        queryset = Marker.objects.exclude(deleted=True) \
+            .filter(marker_id__istartswith="marker") \
+            .filter(create__gte=datetime.datetime.now() - datetime.timedelta(hours=1))
+        queryset2 = Marker.objects.exclude(deleted=True) \
+            .filter(marker_id__istartswith="user") \
+            .exclude(live_ending_time__isnull=False)
         response = []
         for q in [queryset, queryset2]:
             for m in q:
@@ -111,8 +190,8 @@ def fire_chatroom(request):
     for c in room:
         response.append([c.create.strftime(DATE_TIME_FORMAT), c.talk])
     html = render_to_string("chatroom.html",
-                            {"allchat":response,
-                             "chat_id": "chat-"+marker_id})
+                            {"allchat": response,
+                             "chat_id": "chat-" + marker_id})
     d = {"html": html}
     if room.last():
         d["last_time"] = room.last().create.strftime(DATE_TIME_FORMAT)
@@ -142,4 +221,3 @@ def update_chatroom(request):
         if room.last():
             d["last_time"] = room.last().create.strftime(DATE_TIME_FORMAT)
     return JsonResponse(data=d)
-
