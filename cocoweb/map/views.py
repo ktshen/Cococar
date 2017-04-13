@@ -50,9 +50,7 @@ def search_record(request):
         - "longitude"
         - "marker_id"
     """
-    # try:
-    print(request.POST)
-    loc = request.POST["location"][0]
+    loc = request.POST["location"]
     st = datetime.datetime.strptime(str(request.POST["start_time"]), SEARCH_TIME_FORMAT)
     et = datetime.datetime.strptime(str(request.POST["end_time"]), SEARCH_TIME_FORMAT)
     try:
@@ -60,7 +58,6 @@ def search_record(request):
             raise ValueError("Time Value is not right")
     except:
         return HttpResponse(status=400)
-    print("OK")
     gmaps = googlemaps.Client(key=google_key)
     m = "Successfully found some matches."
     s = 0
@@ -68,15 +65,20 @@ def search_record(request):
     matches = []
     records = []
     for pt in geocode_result:
+        marker_id = ""
+        for i in range(len(pt["address_components"])-1, -1, -1):
+            marker_id += pt["address_components"][i]["long_name"]
+            if i != 0: marker_id += ' '
         lat = pt["geometry"]["location"]["lat"]
         lng = pt["geometry"]["location"]["lng"]
         d = {
             "latitude": lat,
             "longitude": lng,
-            "marker_id": pt["address_components"][1]["long_name"] + " " + pt["address_components"][0]["long_name"]
+            "marker_id": marker_id,
         }
         matches.append(d)
         result = GPSInfo.objects.filter(
+            Q(marker__marker_id__istartswith="user") &
             Q(create__gte=st) &
             Q(create__lte=et) &
             Q(longitude__gte=lng - ddelta) &

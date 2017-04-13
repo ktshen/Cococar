@@ -6,6 +6,24 @@
     <link href="{% static "css/map.css" %}" rel="stylesheet">
     <link href="{%  static "css/jquery.datetimepicker.css" %}" rel="stylesheet" type="text/css">
     <script src="{%  static "js/jquery.datetimepicker.full.js" %}"></script>
+    <style>
+
+#search-message{
+    z-index: 1;
+    position: fixed;
+    top: 30px;
+    right: 100px;
+    height:100px;
+    width: 300px;
+    margin: 0px auto;
+    transform: translate(-50%, -50%);
+    -webkit-transition: all 0.4s ease 0s;
+    -moz-transition: all 0.4s ease 0s;
+    -ms-transition: all 0.4s ease 0s;
+    -o-transition: all 0.4s ease 0s;
+    transition: all 0.4s ease 0s;
+}
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -36,9 +54,8 @@
             </li>
         </ul>
     </nav>
-
+    <div id="search-message container"></div>
     <input id="pac-input" class="controls" type="text" placeholder="Search Location">
-    <div id="search-message" class="container"></div>
     <div id="map"></div>
 
     <script>
@@ -62,7 +79,7 @@
         function initMap(){
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 24.968553, lng: 121.190186},
-              zoom: 8
+              zoom: 10
             });
             // Create the search box and link it to the UI element.
             var input = document.getElementById('pac-input');
@@ -135,53 +152,49 @@
                 type: "POST",
                 dataType: "json",
                 success: function(data){
-
-                    console.log(data);
-
                     $(this).clearForm();
                     if(data["status"] === 1){
-                        $("#search-message").append(
-                            "<div class='alert alert-warning'><strong>Fail!</strong>"+data["message"]+"</div>"
-                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();})
+                        alert(data["message"]);
                     }
                     else if (data["status"] === 2){
-                        $("#search-message").append(
-                            "<div class='alert alert-warning'><strong>Fail!</strong>"+data["message"]+"</div>"
-                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();});
+                        alert(data["message"]);
                     }
                     else if (data["status"] === 0){
-                        $("#search-message").append(
-                            "<div class='alert alert-warning'><strong>Success!</strong>"+data["message"]+"</div>"
-                        ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();});
+                        alert(data["message"]);
                         $("#sidebar-wrapper").toggleClass("active");
                         show_records(data);
                     }
                 },
                 error:function(){
-                     $("#search-message").append(
-                            "<div class='alert alert-warning'><strong>Fail!</strong></div>"
-                     ).delay(3000).fadeOut(function(){$("div.alert-warning").remove();})
+                    alert("Fail");
                 }
             });
 
             function show_records(data){
+                console.log("SHITTTT");
                 //clear objects on map
                 clearInterval(update_id);
-                if(chatroom_open.length>0){
-                    chatroom_open[1].close()
-                }
-                for(var i in markers){
-                    markers[i].setMap(null);
-                }
+                map = new google.maps.Map(document.getElementById('map'), {
+                  center: {lat: 24.968553, lng: 121.190186},
+                  zoom: 8
+                });
                 //pin markers on map
-                var m;
-                for( m in data["matches"]){
-                    (function(match){
+                for( i=0 ; i < data["matches"].length; i++){
+                    (function(){
+                        var match = data["matches"][i];
+                        var latlng = new google.maps.LatLng(match["latitude"], match["longitude"]);
                         var mk = new google.maps.Marker({
-                                map: map,
-                                position:new google.maps.LatLng(match["latitude"], match["longitude"]),
-                                icon: "{% static "img/point.png" %}"
-                            });
+                            map: map,
+                            position: latlng,
+                            icon: {
+                                    url: "{% static "img/point.png" %}",
+                                    scaledSize: new google.maps.Size(30, 30)
+                                }
+                        });
+                        if(i===data["matches"].length-1){
+                           map.setCenter(latlng);
+                           map.setZoom(10)
+                        }
                         var infowindow = new google.maps.InfoWindow({
                                             content:match["marker_id"]
                                         });
@@ -191,14 +204,20 @@
                         mk.addListener('mouseout', function(){
                             infowindow.close();
                         });
-                    })(m);
+                    })();
                 }
-                for( m in data["records"]){
-                    (function(record){
+
+                for( i=0 ; i < data["records"].length; i++){
+                    (function(){
+                        var record = data["records"][i];
                         var mk = new google.maps.Marker({
+
                                 map: map,
                                 position:new google.maps.LatLng(record["latitude"], record["longitude"]),
-                                icon: "{% static "img/video.png" %}"
+                                icon: {
+                                    url: "{% static "img/video.png" %}",
+                                    scaledSize: new google.maps.Size(30, 30)
+                                }
                             });
                         var info = "<h3>"+record["marker_id"]+'<h3><span class="glyphicon glyphicon-time"></span>'+record["time"];
                         var infowindow = new google.maps.InfoWindow({
@@ -213,10 +232,10 @@
                         mk.addListener('click', function(){
                             watch_video(record["marker_id"]);
                         })
-                    })(m);
+                    })();
                 }
                 //if turn off button is click, then go to home
-                $("#search-message").append("<button type='button' href="+"{% url "map:map-home" %}"+"class='btn btn-primary'>Done</button>")
+                $("#search-message").append("<button type='button' href="+'{% url "map:map-home" %}'+"class='btn btn-primary'>Done</button>")
             }
         });
 
