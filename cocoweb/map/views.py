@@ -18,7 +18,7 @@ m3u8_base = "http://140.115.158.81/hls"
 DATE_TIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 SEARCH_TIME_FORMAT = "%Y/%m/%d %H:%M"
 # distance delta
-ddelta = 1.0
+ddelta = 0.01
 
 
 # Create your views here.

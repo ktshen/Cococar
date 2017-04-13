@@ -79,7 +79,7 @@
         function initMap(){
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 24.968553, lng: 121.190186},
-              zoom: 10
+              zoom: 15
             });
             // Create the search box and link it to the UI element.
             var input = document.getElementById('pac-input');
@@ -318,11 +318,16 @@
                                     infowindow = markers_window[marker_id];
                                     infowindow.setContent(info);
                                 }
+
                                 if(infowindow !== undefined && chatroom_open[0] !== marker_id){
-                                    infowindow.open(map, mk);
-                                    setTimeout(function(){
-                                        infowindow.close()
-                                    }, 3000);
+                                    var bound = map.getBounds();
+                                    if(bound.contains(p)){
+                                        infowindow.open(map, mk);
+                                        setTimeout(function(){
+                                            infowindow.close()
+                                        }, 3000);
+                                    }
+
                                 }
                             }
                         })(e);
