@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Third Parties
-
+    'crispy_forms',
     #Your App
     'map',
 ]
@@ -125,3 +125,5 @@ SITE_ID = 1
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'

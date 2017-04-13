@@ -9,22 +9,22 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import Marker, GPSInfo, Talk
+from .forms import SearchForm
 
 m3u8_base = "http://140.115.158.81/hls"
-time_format = "%Y:%m:%d %H:%M:%S"
+DATE_TIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 
 # Create your views here.
 
 
 def home(request):
-    return render(request, "map.html")
+    return render(request, "map.html", context={"search_form": SearchForm()})
 
 
 def about(request):
     return render(request, "about.html")
 
-
-def search_record(request):
+def search_record(reqeust):
     pass
 
 
@@ -62,7 +62,7 @@ def request_marker(request):
                 if key not in ["longitude", "latitude", "talk"]:
                     setattr(marker, key, rc[key])
             if "longitude" in rc.keys() and "latitude" in rc.keys():
-                gps = GPSInfo(marker=marker, latitude=rc["latitude"], longitude=rc["longitude"])
+                gps = GPSInfo(marker=marker, latitude=float(rc["latitude"]), longitude=float(rc["longitude"]))
                 gps.save()
             if "talk" in rc.keys() and rc["talk"]:
                 talk = Talk(marker=marker, talk=rc["talk"])
@@ -72,7 +72,7 @@ def request_marker(request):
     else:
         queryset = Marker.objects.exclude(deleted=True)\
                                  .filter(marker_id__istartswith="marker") \
-                                 .filter(create__gte=datetime.datetime.now() - datetime.timedelta(hours=1))
+                                 .filter(create__gte=datetime.datetime.now() - datetime.timedelta(hours=2))
         queryset2 = Marker.objects.exclude(deleted=True)\
                                   .filter(marker_id__istartswith="user")\
                                   .exclude(live_ending_time__isnull=False)
@@ -87,8 +87,8 @@ def request_marker(request):
                 d = {
                     "marker_id": m.marker_id,
                     "user_id": m.user_id,
-                    "longitude": m.gps.order_by("-create")[0].longitude,
-                    "latitude": m.gps.order_by("-create")[0].latitude,
+                    "longitude": str(m.gps.order_by("-create")[0].longitude),
+                    "latitude": str(m.gps.order_by("-create")[0].latitude),
                     "url": m.url,
                     "talk": talk
                 }
@@ -109,13 +109,13 @@ def fire_chatroom(request):
     room = m.talk.order_by('create')
     response = []
     for c in room:
-        response.append([c.create.strftime(time_format), c.talk])
+        response.append([c.create.strftime(DATE_TIME_FORMAT), c.talk])
     html = render_to_string("chatroom.html",
                             {"allchat":response,
                              "chat_id": "chat-"+marker_id})
     d = {"html": html}
     if room.last():
-        d["last_time"] = room.last().create.strftime(time_format)
+        d["last_time"] = room.last().create.strftime(DATE_TIME_FORMAT)
     return JsonResponse(data=d)
 
 
@@ -131,15 +131,15 @@ def update_chatroom(request):
     if not marker_id or not last_time:
         return HttpResponse(status=400)
     m = get_object_or_404(Marker, marker_id=marker_id)
-    last_time = datetime.datetime.strptime(last_time, time_format)
+    last_time = datetime.datetime.strptime(last_time, DATE_TIME_FORMAT)
     room = m.talk.filter(create__gte=last_time + datetime.timedelta(seconds=1)).order_by('create')
     d = {}
     if room.exists():
         response = []
         for c in room:
-            response.append([c.create.strftime(time_format), c.talk])
+            response.append([c.create.strftime(DATE_TIME_FORMAT), c.talk])
         d["html"] = render_to_string("chat.html", {"allchat": response})
         if room.last():
-            d["last_time"] = room.last().create.strftime(time_format)
+            d["last_time"] = room.last().create.strftime(DATE_TIME_FORMAT)
     return JsonResponse(data=d)
 

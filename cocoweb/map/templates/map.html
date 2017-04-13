@@ -1,21 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block head %}
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&callback=initMap"
-    async defer></script>
+    <link href="{% static "css/map.css" %}" rel="stylesheet">
+    <link href="{%  static "css/jquery.datetimepicker.css" %}" rel="stylesheet" type="text/css">
+    <script src="{%  static "js/jquery.datetimepicker.full.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -25,13 +15,21 @@
         <ul class="sidebar-nav">
             <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
             <li class="sidebar-brand">
-                <a href="{% url "map:map-home" %}" onclick=$("#menu-close").click();>Cococar</a>
+                <a href="{% url "map:map-home" %}">Cococar</a>
             </li>
             <li>
-                <a href="{% url "map:map-home" %}" onclick=$("#menu-close").click();>Home</a>
+                <a href="{% url "map:map-home" %}">Home</a>
             </li>
             <li>
-                <a href="{% url "map:search_record" %}" onclick=$("#menu-close").click();>Search for Record</a>
+               <a role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                   Search for Record
+               </a>
+                <div class="collapse" id="collapseExample">
+                    <div class="well">
+                        {% crispy search_form %}
+                    </div>
+                </div>
+
             </li>
             <li>
                 <a href="{% url "map:about" %}" onclick=$("#menu-close").click();>About</a>
@@ -39,6 +37,7 @@
         </ul>
     </nav>
 
+    <input id="pac-input" class="controls" type="text" placeholder="Search Location">
     <div id="map"></div>
 
     <script>
@@ -64,7 +63,66 @@
               center: {lat: 24.968553, lng: 121.190186},
               zoom: 5
             });
+            // Create the search box and link it to the UI element.
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+            // Bias the SearchBox results towards current map's viewport.
+            map.addListener('bounds_changed', function() {
+                searchBox.setBounds(map.getBounds());
+            });
+
+            var search_markers = [];
+            // Listen for the event fired when the user selects a prediction and retrieve
+            // more details for that place.
+            searchBox.addListener('places_changed', function() {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+
+                // Clear out the old markers.
+                search_markers.forEach(function(marker) {
+                    marker.setMap(null);
+                });
+                search_markers = [];
+
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function(place) {
+                    if (!place.geometry) {
+                        console.log("Returned place contains no geometry");
+                        return;
+                    }
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    };
+
+                    // Create a marker for each place.
+                    search_markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: icon,
+                        title: place.name,
+                        position: place.geometry.location
+                    }));
+
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport);
+                        } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
         }
+
 
         $(document).ready(function(){
             setInterval(function(){
@@ -187,6 +245,8 @@
                 function(data){
                     infowindow.setContent(data["html"]);
                     infowindow.open(map, mk);
+                    scrolltobottom(marker_id);
+                    var key_in = false;
                     // post input message when the button is clicked
                     $("div#chat-" + marker_id + " button#btn-chat").click(function(){
                         var value = $("div#chat-" + marker_id +" input:text").val();
@@ -194,8 +254,17 @@
                             JSON.stringify({"marker_id": marker_id, "talk": value}),
                             function(){
                                 $("div#chat-" + marker_id +" input").val("");
+                                key_in = true;
                             }
                         )
+                    });
+                    var t = '<div class="panel-footer"><div class="input-group"><input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..."> <span class="input-group-btn"> <button class="btn btn-warning btn-sm" id="btn-chat">Send</button> </span> </div> </div>';
+
+                    $("div .gm-style-lw").html("<p>shit</p>");
+                    $("div#chat-"+marker_id+" input").keypress(function(e){
+                        if(e.which === 13){
+                            $("div#chat-" + marker_id + " button#btn-chat").click();
+                        }
                     });
                     var last_time = data["last_time"];
                     var task = setInterval(function(){
@@ -205,9 +274,13 @@
                                 if("html" in data){
                                     $("div#chat-" + marker_id +"  ul.chat").append(data["html"]);
                                     last_time = data["last_time"];
+                                    if(key_in){
+                                        scrolltobottom(marker_id);
+                                        key_in = false;
+                                    }
                                 }
                         })
-                    }, 1000);
+                    }, 500);
                     chatroom_open = [marker_id, infowindow, task];
                     infowindow.addListener('closeclick', function(){
                         clearInterval(task);
@@ -216,7 +289,34 @@
             )
         }
 
+        function scrolltobottom(marker_id){
+            var v = $("div#chat-"+marker_id+" ul").height();
+            $("div#chat-"+marker_id+" div.panel-body").scrollTop(v);
+        }
+
+        jQuery(function(){
+            jQuery('#id_start_time').datetimepicker({
+                format:'Y/m/d H:i',
+                onShow:function( ct ){
+                    this.setOptions({
+                        maxDate:jQuery('#id_end_time').val()?jQuery('#id_end_time').val():false
+                    })
+                },
+                defaultDate: new Date()
+            });
+            jQuery('#id_end_time').datetimepicker({
+                format:'Y/m/d H:i',
+                onShow:function( ct ){
+                    this.setOptions({
+                        minDate:jQuery('#id_start_time').val()?jQuery('#id_start_time').val():false
+                    })
+                },
+                defaultDate: new Date()
+            });
+        });
 
     </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5LOxGZoOwWgCF88YUvO4GpOc1ia_oDcY&libraries=places&language=zh-TW&callback=initMap"
+    async defer></script>
 
 {% endblock %}

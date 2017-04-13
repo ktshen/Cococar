@@ -21,8 +21,8 @@ class Marker(models.Model):
 
 class GPSInfo(models.Model):
     marker = models.ForeignKey(Marker, on_delete=models.CASCADE, related_name="gps")
-    longitude = models.CharField(max_length=50)
-    latitude = models.CharField(max_length=50)
+    longitude = models.FloatField()
+    latitude = models.FloatField()
     create = models.DateTimeField(auto_now_add=True)
 
 
