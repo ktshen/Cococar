@@ -33,7 +33,7 @@ http{
         }
         
         location /hls {
-            root /tmp/hls
+            root /tmp;
             allow all;
             add_header 'Access-Control-Allow-Origin' '*';
         }
