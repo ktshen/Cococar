@@ -188,7 +188,7 @@
                             position: latlng,
                             icon: {
                                     url: "{% static "img/point.png" %}",
-                                    scaledSize: new google.maps.Size(30, 30)
+                                    scaledSize: new google.maps.Size(35, 35)
                                 }
                         });
                         if(i===data["matches"].length-1){
@@ -215,8 +215,8 @@
                                 map: map,
                                 position:new google.maps.LatLng(record["latitude"], record["longitude"]),
                                 icon: {
-                                    url: "{% static "img/video.png" %}",
-                                    scaledSize: new google.maps.Size(30, 30)
+                                    url: "{% static "img/record.png" %}",
+                                    scaledSize: new google.maps.Size(35, 35)
                                 }
                             });
                         var info = "<h3>"+record["marker_id"]+'<h3><span class="glyphicon glyphicon-time"></span>'+record["time"];
@@ -270,9 +270,19 @@
                                 }
                             }
                             else{
+                                var img_url;
+                                if(marker_id.substring(0, 4) === "user"){
+                                    img_url = "{% static "img/live.png" %}";
+                                }
+                                else
+                                    img_url = "{% static "img/chat.png" %}";
                                 mk = new google.maps.Marker({
                                     map: map,
-                                    position:p
+                                    position:p,
+                                    icon: {
+                                        url: img_url,
+                                        scaledSize: new google.maps.Size(35, 35)
+                                    }
                                 });
                                 markers[marker_id] = mk;
                                 if(marker_id.substring(0, 4) === "user"){
