@@ -59,7 +59,7 @@ public class BackgroundTask extends AsyncTask<String,Void,String>
                 httpURLConnection.setDoOutput(true);//post的情況下需要設置DoOutput為true
                 OutputStream os =httpURLConnection.getOutputStream();//java.io.OutputStream是以byte為單位的輸出串流（stream）類別，用來處理出的資料通道
                 BufferedWriter bufferedWriter=new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-                Log.d("COCO","in back 3");
+                Log.d("iwant","in back 3");
                 //InputStreamReader 與 OutputStreamWriter 類別屬於「由 byte 轉成 char」的
                 // 中繼接頭。舉例來說，在處理資料輸入時，資料輸出的 outputStream 像是小口徑的水管
                 // ，而我們希望能將小水管轉換為大口徑的 Bufferedwriter 這類大水管時，可利用 outputStreamWriter 這類轉換器，將 outStream 轉換為 Writer，

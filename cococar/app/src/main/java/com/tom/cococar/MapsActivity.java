@@ -87,7 +87,6 @@ import java.util.concurrent.Executors;
 public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static String url = "rtmp://140.115.158.81:1935/live/";
     public static String json_url="http://140.115.158.81/cococar/marker";
-
     private static final int REQUEST_LOCATION = 2;
     private GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
@@ -494,6 +493,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 boolean inList = false;
                 double latitude_in = Double.parseDouble(tran.latitude);
                 double longitude_in = Double.parseDouble(tran.longitude);
+                Log.d("ncu",tran.latitude);
+                Log.d("ncu",tran.longitude);
                 LatLng Now = new LatLng(latitude_in, longitude_in);
                 if (!markerlist.isEmpty()) {
                     for (Marker m : markerlist) {
@@ -559,13 +560,22 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         //noinspection MissingPermission
         Location location = locationManager.getLastKnownLocation("network");
         fixrand = "marker-"+rand;
+        Log.d("qwers", ""+talkadd);
         if(!talkadd) {
             Toast toast = Toast.makeText(this, "Add a fix marker", Toast.LENGTH_SHORT);
             toast.show();
             String method = "register";
+            Log.d("qwerstimmy", ""+talkadd);
             String longitude = String.valueOf(location.getLongitude());
             String latitude = String.valueOf(location.getLatitude());
             BackgroundTask backgroundTask = new BackgroundTask(this);
+            Log.d("qwer", id);
+            Log.d("qwer", longitude);
+            Log.d("qwer", latitude);
+            if(id.equals(""))
+            {
+                id="client";
+            }
             backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR, method, id, fixrand, longitude, latitude, "",edtalk.getText().toString());//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
             talkadd = true;
         }
@@ -705,7 +715,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     protected void onResume(){
         super.onResume();
         Log.d("bag", "url1");
-        liverand = "user-"+rand;
         liverand = "user-"+rand;
         StopTask stop = new StopTask();
         stop.executeOnExecutor(THREAD_POOL_EXECUTOR,liverand);

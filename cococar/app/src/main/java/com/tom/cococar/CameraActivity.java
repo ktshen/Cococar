@@ -150,15 +150,15 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
                 if(btnPublish.getText().toString().contentEquals("stop")){
                     mPublisher.stopPublish();
                     mPublisher.stopRecord();
-                    StopTask stop = new StopTask();
-                    stop.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
+                    //StopTask stop = new StopTask();
+                   // stop.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
                     btnPublish.setText("publish");
                     btnRecord.setText("record");
                     btnSwitchEncoder.setEnabled(true);
                     //回到地圖
-                    Intent intent;
-                    intent = new Intent(CameraActivity.this, MapsActivity.class);
-                    startActivity(intent);
+                    //Intent intent;
+                    //intent = new Intent(CameraActivity.this, MapsActivity.class);
+                    //startActivity(intent);
                 }
             }
         });
