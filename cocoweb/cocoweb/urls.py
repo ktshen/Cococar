@@ -15,8 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.shortcuts import redirect
+
+
+def redirect_to_home(request):
+    return redirect("cococar/", permanent=True)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^cococar/', include('map.urls', namespace='map', app_name='map')),
+    url(r'^$', redirect_to_home)
 ]
+
