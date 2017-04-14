@@ -25,10 +25,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -74,12 +84,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends ActionBarActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static String url = "rtmp://140.115.158.81:1935/live/";
-    public static String json_url="http://140.115.158.81/project/getjson.php";
+    public static String json_url="http://140.115.158.81/cococar/marker";
 
     private static final int REQUEST_LOCATION = 2;
-    private static final int REQUEST_CAMERA = 3;
     private GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     LocationRequest locationRequest;
@@ -90,11 +99,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean livestart = false;
     private EditText edtalk;
     private EditText e_address;
-    private Button submit;
-    private Button delete;
+    private ImageButton submit;
+    private ImageButton delete;
+    private ImageButton startlive;
+    private ImageButton save;
+    private ImageButton voice;
+    private ImageButton logout;
+    private ImageButton search;
     String liverand="";
     String fixrand="";
     String strAddress="";
+    boolean savefilm = false;
 
     //聲控
     private SpeechRecognizer recognizer;
@@ -108,14 +123,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String language= Locale.getDefault().getDisplayLanguage();
+        Log.d("language",language);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Intent intent=getIntent();
         id=intent.getStringExtra("id");
         e_address= (EditText) findViewById(R.id.address);
         edtalk = (EditText) findViewById(R.id.ed_talk);
-        submit = (Button) findViewById(R.id.submit);
-        delete=(Button)findViewById(R.id.delete);
+        submit = (ImageButton) findViewById(R.id.submit);
+        delete=(ImageButton)findViewById(R.id.delete);
+        save= (ImageButton) findViewById(R.id.save);
+        startlive= (ImageButton) findViewById(R.id.startlive);
+        voice= (ImageButton) findViewById(R.id.voice);
+        logout= (ImageButton) findViewById(R.id.logout);
+        search= (ImageButton) findViewById(R.id.search);
+        if(language.equals("中文")){
+            submit.setImageResource(R.drawable.submitch);
+            delete.setImageResource(R.drawable.deletech);
+            save.setImageResource(R.drawable.savech);
+            startlive.setImageResource(R.drawable.livech);
+            voice.setImageResource(R.drawable.voicech);
+            logout.setImageResource(R.drawable.logoutch);
+            search.setImageResource(R.drawable.searchch);
+        }
+
 
         //聲控
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -134,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .addApi(AppIndex.API).build();
         }
         createLocationRequest();
+
         UpdateSync update = new UpdateSync();
         update.executeOnExecutor(THREAD_POOL_EXECUTOR);
         LiveTask live = new LiveTask();
@@ -175,7 +208,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 //連結到撥放器
-                if(marker.getTitle().indexOf("marker")!=-1) {
+                if(marker.getTitle().indexOf("user")!=-1) {
                     Intent intent = new Intent(MapsActivity.this, PlayerActivity.class);
                     intent.putExtra("url", "rtmp://140.115.158.81:1935/live/"+marker.getTitle());
                     startActivity(intent);
@@ -189,28 +222,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //noinspection MissingPermission
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(
-            new GoogleMap.OnMyLocationButtonClickListener() {
-                @Override
-                public boolean onMyLocationButtonClick() {
-                    // 透過位置服務，取得目前裝置所在
-                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                    Criteria criteria = new Criteria();
-                    // 設定標準為存取精確
-                    criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                    // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
-                    String provider = locationManager.getBestProvider(criteria, true);
-                    //noinspection MissingPermission
-                    Location location = locationManager.getLastKnownLocation(provider);
-                    if (location != null) {
-                        Log.i("LOCATION", location.getLatitude() + "/" +
-                                location.getLongitude());
+                new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        // 透過位置服務，取得目前裝置所在
+                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                        Criteria criteria = new Criteria();
+                        // 設定標準為存取精確
+                        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                        // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
+                        String provider = locationManager.getBestProvider(criteria, true);
+                        //noinspection MissingPermission
+                        Location location = locationManager.getLastKnownLocation(provider);
+                        if (location != null) {
+                            Log.i("LOCATION", location.getLatitude() + "/" +
+                                    location.getLongitude());
 //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
 //                                new LatLng(location.getLatitude(), location.getLongitude())
 //                                , 15));
+                        }
+                        return false;
                     }
-                    return false;
                 }
-            }
         );
     }
 
@@ -338,6 +371,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void save(View view){
+        if(!savefilm){
+            //開啟儲存
+            savefilm = true;
+            Toast toast = Toast.makeText(this, "Open save control", Toast.LENGTH_SHORT);
+            toast.show();
+        }else{
+            //關閉儲存
+            savefilm = false;
+            Toast toast = Toast.makeText(this, "Close save control", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
     public void live_button(View view) {
         live();
     }
@@ -350,8 +397,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (int i = 0; i < array.length(); i++) {
                 Log.d("COCO", "COCO3");
                 JSONObject obj = array.getJSONObject(i);
-                String id = obj.getString("id");
-                String rand = obj.getString("rand");
+                String id = obj.getString("user_id");
+                String rand = obj.getString("marker_id");
                 String latitude = obj.getString("latitude");
                 String longitude = obj.getString("longitude");
                 String url = obj.getString("url");
@@ -453,14 +500,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String mtitle = m.getTitle();
                         Log.d("ProcessUpdate", mtitle);
                         if (mtitle.equals(tran.rand)) {
-                            if(rand.indexOf("marker") != -1) {
+                            if(rand.indexOf("user") != -1) {
                                 m.setPosition(Now);
                                 markerlistcopy.add(m);
                                 markerlist.remove(m);
                                 inList = true;
                                 break;
                             }
-                            else if(rand.indexOf("user") != -1){
+                            else if(rand.indexOf("marker") != -1){
                                 m.setSnippet(tran.talk);
                                 markerlistcopy.add(m);
                                 markerlist.remove(m);
@@ -472,7 +519,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if (!inList) {
                     String rand = tran.rand;
-                    if(rand.indexOf("marker") != -1) {
+                    if(rand.indexOf("user") != -1) {
                         Marker marker = mMap.addMarker(new MarkerOptions()
                                 .position(Now)
                                 .title(tran.rand)
@@ -480,7 +527,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         markerlistcopy.add(marker);
                         marker.hideInfoWindow();
                     }
-                    else if(rand.indexOf("user") != -1){
+                    else if(rand.indexOf("marker") != -1){
                         Marker marker = mMap.addMarker(new MarkerOptions()
                                 .position(Now)
                                 .title(tran.id)
@@ -511,7 +558,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String provider = locationManager.getBestProvider(criteria, true);
         //noinspection MissingPermission
         Location location = locationManager.getLastKnownLocation("network");
-        fixrand = "user"+rand;
+        fixrand = "marker"+rand;
         if(!talkadd) {
             Toast toast = Toast.makeText(this, "Add a fix marker", Toast.LENGTH_SHORT);
             toast.show();
@@ -519,7 +566,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String longitude = String.valueOf(location.getLongitude());
             String latitude = String.valueOf(location.getLatitude());
             BackgroundTask backgroundTask = new BackgroundTask(this);
-            backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR, method, id, fixrand, longitude, latitude, "");//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+            backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR, method, id, fixrand, longitude, latitude, "",edtalk.getText().toString());//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
             talkadd = true;
         }
         String w=edtalk.getText().toString();
@@ -528,7 +575,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         edtalk.getText().clear();
     }
 
-   public void delete (View v)
+    public void delete (View v)
     {
         talkadd = false;
         DeleteTask  deleteTask=new  DeleteTask();
@@ -638,12 +685,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String longitude = String.valueOf(location.getLongitude());
         String latitude = String.valueOf(location.getLatitude());
         BackgroundTask backgroundTask=new BackgroundTask(this);
-        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url1);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        backgroundTask.executeOnExecutor(THREAD_POOL_EXECUTOR,method,id,liverand,longitude,latitude,url1," ");//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
         Log.d("janices", "in back 2");
         //連結到camera
 
         Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("url", url1);
+        intent.putExtra("marker_id", liverand);
+        intent.putExtra("save", savefilm);
         Log.d("janices", "in back 3");
         startActivity(intent);
     }

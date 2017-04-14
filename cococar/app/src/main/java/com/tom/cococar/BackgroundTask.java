@@ -39,7 +39,7 @@ public class BackgroundTask extends AsyncTask<String,Void,String>
     protected String doInBackground(String... params) //背景中做的事
     {
         Log.d("COCO","in back");
-        String reg_url="http://140.115.158.81/project/register.php";
+        String reg_url="http://140.115.158.81/cococar/marker";
         String method=params[0];
         if(method.equals("register")){
             Log.d("COCO","in back 1");
@@ -48,6 +48,7 @@ public class BackgroundTask extends AsyncTask<String,Void,String>
             String longitude=params[3];
             String latitude=params[4];
             String url_get = params[5];
+            String talk = params[6];
 
             try {
                 Log.d("COCO","in back 2");
@@ -63,11 +64,21 @@ public class BackgroundTask extends AsyncTask<String,Void,String>
                 // 中繼接頭。舉例來說，在處理資料輸入時，資料輸出的 outputStream 像是小口徑的水管
                 // ，而我們希望能將小水管轉換為大口徑的 Bufferedwriter 這類大水管時，可利用 outputStreamWriter 這類轉換器，將 outStream 轉換為 Writer，
                 //更多http解說:  https://litotom.com/2016/05/11/java%E7%9A%84%E7%B6%B2%E8%B7%AF%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88/
-                String data= URLEncoder.encode("id","UTF-8")+"="+URLEncoder.encode(id,"UTF-8")+"&"+
-                        URLEncoder.encode("rand","UTF-8")+"="+URLEncoder.encode(rand,"UTF-8")+"&"+
-                        URLEncoder.encode("longitude","UTF-8")+"="+URLEncoder.encode(longitude,"UTF-8")+"&"+
-                        URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(latitude,"UTF-8")+"&"+
-                        URLEncoder.encode("url","UTF-8")+"="+URLEncoder.encode(url_get,"UTF-8");
+
+                String data = "{\"user_id\":\"" + id +
+                        "\", \"marker_id\":\""+ rand +
+                        "\", \"url\":\""+ url_get +
+                        "\",  \"longitude\": \""+ longitude +
+                        "\", \"latitude\": \"" + latitude +
+                        "\", \"talk\": \"" + talk +
+                        "\"}";
+
+//                String data= URLEncoder.encode("user_id","UTF-8")+"="+URLEncoder.encode(id,"UTF-8")+"&"+
+//                        URLEncoder.encode("url","UTF-8")+"="+URLEncoder.encode(url_get,"UTF-8")+"&"+
+//                        URLEncoder.encode("longitude","UTF-8")+"="+URLEncoder.encode(longitude,"UTF-8")+"&"+
+//                        URLEncoder.encode("latitude","UTF-8")+"="+URLEncoder.encode(latitude,"UTF-8")+"&"+
+//                        URLEncoder.encode("talk","UTF-8")+"="+URLEncoder.encode(" ","UTF-8")+"&"+
+//                        URLEncoder.encode("marker_id","UTF-8")+"="+URLEncoder.encode(rand,"UTF-8");
                 Log.d("COCO","in back 4");
                 //&在php中表示下一個表單欄位的開始
                 bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。

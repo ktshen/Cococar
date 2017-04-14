@@ -61,6 +61,8 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 
     public Date d = new Date();
 
+    boolean save;
+
     Button btnPublish = null;
     Button btnSwitchCamera = null;
     Button btnRecord = null;
@@ -69,7 +71,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
     private SharedPreferences sp;
     private String rtmpUrl = "rtmp://ossrs.net/" + getRandomAlphaString(3) + '/' + getRandomAlphaDigitString(5);
     private String recPath = Environment.getExternalStorageDirectory().getPath() + "/" + d.toString() + ".mp4";
-    String value="";
+    String marker_id="";
     private SrsPublisher mPublisher;
 
     private static ExecutorService THREAD_POOL_EXECUTOR;
@@ -90,17 +92,20 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         rtmpUrl = sp.getString("rtmpUrl", rtmpUrl);
 
         Intent intent = getIntent();
-        if (intent.hasExtra("url")) {
-            value= intent.getStringExtra("url");
-            rtmpUrl=value;
-            Log.d("values", value);
+        if (intent.hasExtra("marker_id")) {
+            marker_id = intent.getStringExtra("marker_id");
+            rtmpUrl="rtmp://140.115.158.81:1935/live/" + marker_id;
+            Log.d("values", marker_id);
         }else{
             Log.d("values", "asasas");
+        }
+        if (intent.hasExtra("save")) {
+            save = intent.getBooleanExtra("save", false);
         }
 
         //LocationSync
         LocationSync update = new LocationSync();
-        update.executeOnExecutor(THREAD_POOL_EXECUTOR,rtmpUrl);
+        update.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
 
         // restore data.
 
@@ -127,39 +132,26 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         mPublisher.setVideoSmoothMode();
         mPublisher.startPublish(rtmpUrl);
 
-        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
-        }
+//        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+//            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+//        }
         btnPublish.setText("stop");
         btnSwitchEncoder.setEnabled(false);
+
+        if(save){
+            mPublisher.startRecord(recPath);
+        }
 
         btnPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (btnPublish.getText().toString().contentEquals("publish")) {
-//                    rtmpUrl = efu.getText().toString();
-//                    SharedPreferences.Editor editor = sp.edit();
-//                    editor.putString("rtmpUrl", rtmpUrl);
-//                    editor.apply();
-//
-//                    mPublisher.setPreviewResolution(1280, 720);
-//                    mPublisher.setOutputResolution(384, 640);
-//                    mPublisher.setVideoSmoothMode();
-//                    mPublisher.startPublish(rtmpUrl);
-//
-//                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-//                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
-//                    }
-//                    btnPublish.setText("stop");
-//                    btnSwitchEncoder.setEnabled(false);
-//                } else if (btnPublish.getText().toString().contentEquals("stop")) {
                 if(btnPublish.getText().toString().contentEquals("stop")){
                     mPublisher.stopPublish();
                     mPublisher.stopRecord();
+                    StopTask stop = new StopTask();
+                    stop.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
                     btnPublish.setText("publish");
                     btnRecord.setText("record");
                     btnSwitchEncoder.setEnabled(true);
@@ -180,21 +172,21 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             }
         });
 
-        btnRecord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (btnRecord.getText().toString().contentEquals("record")) {
-                    mPublisher.startRecord(recPath);
-                    btnRecord.setText("pause");
-                } else if (btnRecord.getText().toString().contentEquals("pause")) {
-                    mPublisher.pauseRecord();
-                    btnRecord.setText("resume");
-                } else if (btnRecord.getText().toString().contentEquals("resume")) {
-                    mPublisher.resumeRecord();
-                    btnRecord.setText("pause");
-                }
-            }
-        });
+//        btnRecord.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (btnRecord.getText().toString().contentEquals("record")) {
+//                    mPublisher.startRecord(recPath);
+//                    btnRecord.setText("pause");
+//                } else if (btnRecord.getText().toString().contentEquals("pause")) {
+//                    mPublisher.pauseRecord();
+//                    btnRecord.setText("resume");
+//                } else if (btnRecord.getText().toString().contentEquals("resume")) {
+//                    mPublisher.resumeRecord();
+//                    btnRecord.setText("pause");
+//                }
+//            }
+//        });
 
         btnSwitchEncoder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -431,7 +423,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         String latitude;
         String longitude;
 
-        String reg_url="http://140.115.158.81/project/update.php";
+        String reg_url="http://140.115.158.81/cococar/marker";
 
         private void createLocationRequest() {
             locationRequest = new LocationRequest();
@@ -479,10 +471,16 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
                         // 中繼接頭。舉例來說，在處理資料輸入時，資料輸出的 outputStream 像是小口徑的水管
                         // ，而我們希望能將小水管轉換為大口徑的 Bufferedwriter 這類大水管時，可利用 outputStreamWriter 這類轉換器，將 outStream 轉換為 Writer，
                         //更多http解說:  https://litotom.com/2016/05/11/java%E7%9A%84%E7%B6%B2%E8%B7%AF%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88/
-                        String data =
-                                URLEncoder.encode("longitude", "UTF-8") + "=" + URLEncoder.encode(longitude, "UTF-8") + "&" +
-                                        URLEncoder.encode("latitude", "UTF-8") + "=" + URLEncoder.encode(latitude, "UTF-8") + "&" +
-                                        URLEncoder.encode("url", "UTF-8") + "=" + URLEncoder.encode(s[0], "UTF-8");
+
+                        String data = "{\"marker_id\":\"" + s[0] +
+                                "\",  \"longitude\": \""+ longitude +
+                                "\", \"latitude\": \"" + latitude +
+                                "\"}";
+
+//                        String data =
+//                                URLEncoder.encode("longitude", "UTF-8") + "=" + URLEncoder.encode(longitude, "UTF-8") + "&" +
+//                                        URLEncoder.encode("latitude", "UTF-8") + "=" + URLEncoder.encode(latitude, "UTF-8") + "&" +
+//                                        URLEncoder.encode("marker_id", "UTF-8") + "=" + URLEncoder.encode(s[0], "UTF-8");
                         Log.d("COCO", "in back 4");
                         //&在php中表示下一個表單欄位的開始
                         bufferedWriter.write(data);// //使用缓冲区中的方法将数据写入到缓冲区中。

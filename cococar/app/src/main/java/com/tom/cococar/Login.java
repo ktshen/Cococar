@@ -1,6 +1,7 @@
 package com.tom.cococar;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -29,11 +31,11 @@ import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class Login extends AppCompatActivity {
+public class Login extends Activity {
     LoginButton loginButton;
     CallbackManager callbackManager;
     String facebookid="";
-    private Button b_enter;
+    private ImageButton b_enter;
     private EditText e_id;
 
     //權限變數
@@ -66,7 +68,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
-        b_enter= (Button) findViewById(R.id.fuckyou);
+        b_enter= (ImageButton) findViewById(R.id.fuckyou);
         e_id= (EditText) findViewById(R.id.enterid);
         loginButton = (LoginButton) findViewById(R.id.fb_login_bn);
         callbackManager=CallbackManager.Factory.create();
@@ -136,13 +138,13 @@ public class Login extends AppCompatActivity {
             return;
         }
     }
-   public void enter(View v){
-       String w =e_id.getText().toString();
-       Toast toast = Toast.makeText(this, "Log in by ID : "+w, Toast.LENGTH_SHORT);
-       toast.show();
-       Intent intent;
-       intent = new Intent(this, MapsActivity.class);
-       intent.putExtra("id",w);
-       startActivity(intent);
-   }
+    public void enter(View v){
+        String w =e_id.getText().toString();
+        Toast toast = Toast.makeText(this, "Log in by ID : "+w, Toast.LENGTH_SHORT);
+        toast.show();
+        Intent intent;
+        intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("id",w);
+        startActivity(intent);
+    }
 }

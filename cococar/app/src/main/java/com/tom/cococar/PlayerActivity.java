@@ -1,5 +1,6 @@
 package com.tom.cococar;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,7 +16,7 @@ import tcking.github.com.giraffeplayer.GiraffePlayer;
 import tcking.github.com.giraffeplayer.GiraffePlayerActivity;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
-public class PlayerActivity extends AppCompatActivity {
+public class PlayerActivity extends Activity {
     GiraffePlayer player;
 
     String rtmpurl = "";
