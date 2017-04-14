@@ -174,8 +174,8 @@ def request_marker(request):
                 d = {
                     "marker_id": m.marker_id,
                     "user_id": m.user_id,
-                    "longitude": str(m.gps.order_by("-create")[0].longitude),
-                    "latitude": str(m.gps.order_by("-create")[0].latitude),
+                    "longitude": str(m.gps.order_by("-create").first().longitude),
+                    "latitude": str(m.gps.order_by("-create").first().latitude),
                     "url": m.url,
                     "talk": talk
                 }
