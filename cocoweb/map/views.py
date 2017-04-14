@@ -151,6 +151,7 @@ def request_marker(request):
                     if i not in rc.keys():
                         return HttpResponse(status=400)
                 marker = Marker()
+                marker.save()
             for key in rc.keys():
                 if key not in ["longitude", "latitude", "talk"]:
                     setattr(marker, key, rc[key])
