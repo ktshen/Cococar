@@ -64,6 +64,7 @@ rtmp {
 sudo uwsgi --ini uwsgi/cococar.ini
 sudo /usr/local/nginx/sbin/nginx            (start nginx)
 
+sudo uwsgi --stop /tmp/project-master.pid
 sudo /usr/local/nginx/sbin/nginx -s stop    (stop nginx)
 ````
 
