@@ -140,6 +140,7 @@ def request_marker(request):
                 try:
                     marker = Marker.objects.get(marker_id=marker_id)
                     marker.deleted = True
+                    marker.save()
                 except Marker.DoesNotExist:
                     return HttpResponse(status=400)
         else:
