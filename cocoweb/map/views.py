@@ -66,7 +66,7 @@ def search_record(request):
     records = []
     for pt in geocode_result:
         marker_id = ""
-        for i in range(len(pt["address_components"])-1, -1, -1):
+        for i in range(len(pt["address_components"]) - 1, -1, -1):
             marker_id += pt["address_components"][i]["long_name"]
             if i != 0: marker_id += ' '
         lat = pt["geometry"]["location"]["lat"]
@@ -77,21 +77,26 @@ def search_record(request):
             "marker_id": marker_id,
         }
         matches.append(d)
-        result = GPSInfo.objects.filter(
-            Q(marker__marker_id__istartswith="user") &
-            Q(create__gte=st) &
-            Q(create__lte=et) &
-            Q(longitude__gte=lng - ddelta) &
-            Q(longitude__lte=lng + ddelta) &
-            Q(latitude__gte=lat - ddelta) &
-            Q(latitude__lte=lat + ddelta)
+        result = Marker.objects.filter(
+            Q(marker_id__istartswith="user") &
+            Q(gps__create__gte=st) &
+            Q(gps__create__lte=et) &
+            Q(gps__longitude__gte=lng - ddelta) &
+            Q(gps__longitude__lte=lng + ddelta) &
+            Q(gps__latitude__gte=lat - ddelta) &
+            Q(gps__latitude__lte=lat + ddelta)
         )
-        for gps in result:
+        for mk in result:
             d = {
-                "time": gps.create.strftime(DATE_TIME_FORMAT),
-                "latitude": gps.latitude,
-                "longitude": gps.longitude,
-                "marker_id": gps.marker.marker_id,
+                "time": mk.create.strftime(DATE_TIME_FORMAT),
+                "latitude": mk.gps.filter(latitude__gte=lat - ddelta) \
+                    .filter(latitude__lte=lat + ddelta).order_by("create") \
+                    .last(),
+                "longitude": mk.gps.filter(longitude__gte=lng - ddelta) \
+                    .filter(longitude__lte=lng + ddelta)
+                    .order_by("create") \
+                    .last(),
+                "marker_id": mk.marker_id,
             }
             records.append(d)
     if not len(geocode_result):
