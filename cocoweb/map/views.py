@@ -151,17 +151,16 @@ def request_marker(request):
                     if i not in rc.keys():
                         return HttpResponse(status=400)
                 marker = Marker()
-                marker.save()
             for key in rc.keys():
                 if key not in ["longitude", "latitude", "talk"]:
                     setattr(marker, key, rc[key])
+            marker.save()
             if "longitude" in rc.keys() and "latitude" in rc.keys():
                 gps = GPSInfo(marker=marker, latitude=float(rc["latitude"]), longitude=float(rc["longitude"]))
                 gps.save()
             if "talk" in rc.keys() and rc["talk"]:
                 talk = Talk(marker=marker, talk=rc["talk"])
                 talk.save()
-            marker.save()
         return HttpResponse(status=200)
     else:
         queryset = Marker.objects.exclude(deleted=True) \
