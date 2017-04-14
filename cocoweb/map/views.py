@@ -91,11 +91,11 @@ def search_record(request):
                 "time": mk.create.strftime(DATE_TIME_FORMAT),
                 "latitude": mk.gps.filter(latitude__gte=lat - ddelta) \
                     .filter(latitude__lte=lat + ddelta).order_by("create") \
-                    .last(),
+                    .last().latitude,
                 "longitude": mk.gps.filter(longitude__gte=lng - ddelta) \
                     .filter(longitude__lte=lng + ddelta)
                     .order_by("create") \
-                    .last(),
+                    .last().longitude,
                 "marker_id": mk.marker_id,
             }
             records.append(d)
