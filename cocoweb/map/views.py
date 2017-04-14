@@ -143,7 +143,7 @@ def request_marker(request):
                     marker.save()
                 except Marker.DoesNotExist:
                     return HttpResponse(status=400)
-        else:
+        elif len(rc.keys()) > 1:
             marker = Marker.objects.get_or_create(marker_id=marker_id)[0]
             for key in rc.keys():
                 if key not in ["longitude", "latitude", "talk"]:
@@ -155,6 +155,8 @@ def request_marker(request):
                 talk = Talk(marker=marker, talk=rc["talk"])
                 talk.save()
             marker.save()
+        else:
+            return HttpResponse(status=400)
         return HttpResponse(status=200)
     else:
         queryset = Marker.objects.exclude(deleted=True) \
