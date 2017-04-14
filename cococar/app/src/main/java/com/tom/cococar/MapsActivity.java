@@ -558,7 +558,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String provider = locationManager.getBestProvider(criteria, true);
         //noinspection MissingPermission
         Location location = locationManager.getLastKnownLocation("network");
-        fixrand = "marker"+rand;
+        fixrand = "marker-"+rand;
         if(!talkadd) {
             Toast toast = Toast.makeText(this, "Add a fix marker", Toast.LENGTH_SHORT);
             toast.show();
@@ -580,7 +580,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         talkadd = false;
         DeleteTask  deleteTask=new  DeleteTask();
         String dellive=liverand;
-        String delfix=fixrand;
+        String delfix="marker-"+rand;
         deleteTask.executeOnExecutor(THREAD_POOL_EXECUTOR,dellive,delfix);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
     }
 
@@ -678,7 +678,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                     .title("Current Position"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
         }
-        liverand = "marker"+rand;
+        liverand = "user-"+rand;
         url1=url1+liverand;
         Log.d("bg", url1);
         String method="register";
@@ -694,11 +694,22 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         intent.putExtra("save", savefilm);
         Log.d("janices", "in back 3");
         startActivity(intent);
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("bag", "url1");
+        liverand = "user-"+rand;
+        liverand = "user-"+rand;
+        StopTask stop = new StopTask();
+        stop.executeOnExecutor(THREAD_POOL_EXECUTOR,liverand);
+    }
+
 }
 
