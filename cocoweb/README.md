@@ -55,8 +55,6 @@ rtmp {
             hls_cleanup off;
     }
 }
-
-}
 ````
 
 #### Fire the website (current directory should be cocoweb)
@@ -64,8 +62,9 @@ rtmp {
 sudo uwsgi --ini uwsgi/cococar.ini
 sudo /usr/local/nginx/sbin/nginx            (start nginx)
 
-sudo uwsgi --stop /tmp/project-master.pid
+sudo uwsgi --stop /tmp/cococar.pid
 sudo /usr/local/nginx/sbin/nginx -s stop    (stop nginx)
+tail -f /tmp/cococar.log                    (watch logs)
 ````
 
 
