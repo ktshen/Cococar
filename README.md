@@ -1,4 +1,4 @@
-![Screenshot](cococar.svg)
+![alt tag](https://github.com/ktshen/Cococar/blob/master/cococar.svg)
 # Cococar
 Android google map providing live streaming of user road condition
 
