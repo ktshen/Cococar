@@ -659,13 +659,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String provider = locationManager.getBestProvider(criteria, true);
         //noinspection MissingPermission
         Location location = locationManager.getLastKnownLocation("network");
-        if (location != null) {
-            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
-            mMap.addMarker(new MarkerOptions()
-                    .position(Now)
-                    .title("Current Position"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
-        }
+//        if (location != null) {
+//            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
+//            mMap.addMarker(new MarkerOptions()
+//                    .position(Now)
+//                    .title("Current Position"));
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
+//        }
         liverand = "user-"+rand;
         url1=url1+liverand;
         Log.d("bg", url1);
