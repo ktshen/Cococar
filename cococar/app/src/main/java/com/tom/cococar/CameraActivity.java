@@ -147,7 +147,25 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         btnPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(btnPublish.getText().toString().contentEquals("stop")){
+                if (btnPublish.getText().toString().contentEquals("publish")) {
+                    rtmpUrl = efu.getText().toString();
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("rtmpUrl", rtmpUrl);
+                    editor.apply();
+
+                    mPublisher.setPreviewResolution(1280, 720);
+                    mPublisher.setOutputResolution(384, 640);
+                    mPublisher.setVideoSmoothMode();
+                    mPublisher.startPublish(rtmpUrl);
+
+                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+                    }
+                    btnPublish.setText("stop");
+                    btnSwitchEncoder.setEnabled(false);
+                }else if(btnPublish.getText().toString().contentEquals("stop")){
                     mPublisher.stopPublish();
                     mPublisher.stopRecord();
                     //StopTask stop = new StopTask();
@@ -172,21 +190,21 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             }
         });
 
-//        btnRecord.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (btnRecord.getText().toString().contentEquals("record")) {
-//                    mPublisher.startRecord(recPath);
-//                    btnRecord.setText("pause");
-//                } else if (btnRecord.getText().toString().contentEquals("pause")) {
-//                    mPublisher.pauseRecord();
-//                    btnRecord.setText("resume");
-//                } else if (btnRecord.getText().toString().contentEquals("resume")) {
-//                    mPublisher.resumeRecord();
-//                    btnRecord.setText("pause");
-//                }
-//            }
-//        });
+        btnRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (btnRecord.getText().toString().contentEquals("record")) {
+                    mPublisher.startRecord(recPath);
+                    btnRecord.setText("pause");
+                } else if (btnRecord.getText().toString().contentEquals("pause")) {
+                    mPublisher.pauseRecord();
+                    btnRecord.setText("resume");
+                } else if (btnRecord.getText().toString().contentEquals("resume")) {
+                    mPublisher.resumeRecord();
+                    btnRecord.setText("pause");
+                }
+            }
+        });
 
         btnSwitchEncoder.setOnClickListener(new View.OnClickListener() {
             @Override
