@@ -570,6 +570,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String dellive=liverand;
         String delfix="marker-"+rand;
         deleteTask.executeOnExecutor(THREAD_POOL_EXECUTOR,dellive,delfix);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        rand = Integer.toString((int) (Math.random()*10000));
     }
 
     public class LiveTask extends AsyncTask<Void, Void, Void>{
