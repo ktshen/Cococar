@@ -1,3 +1,4 @@
+{% load static %}
 <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -5,7 +6,10 @@
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
             </button>
-            <a class="navbar-brand page-scroll" href="{% url "map:map-home" %}">Cococar</a>
+
+            <a  href="{% url "map:map-home" %}">
+                <img src="{% static "img/cococar.svg" %}" height="45" width="120">
+            </a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
