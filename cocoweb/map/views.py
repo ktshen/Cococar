@@ -122,7 +122,7 @@ def video(request):
     marker = get_object_or_404(Marker, marker_id=marker_id)
     m3u8_path = os.path.join(m3u8_base, marker_id, "index.m3u8")
     return render(request, "hls.html", context={"hls_url": m3u8_path,
-                                                "live-ing": True if marker.live_ending_time else False})
+                                                "live": True if not marker.live_ending_time else False})
 
 
 @csrf_exempt

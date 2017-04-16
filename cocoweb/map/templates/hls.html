@@ -28,7 +28,7 @@
       if(Hls.isSupported()) {
         var video = document.getElementById('video');
         var hls = new Hls({
-            {% if live-ing %}
+            {% if live %}
                 startPosition: -1,
             {% else %}
                 startPosition: 0,
