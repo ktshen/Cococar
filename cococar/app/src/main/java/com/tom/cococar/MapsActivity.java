@@ -81,6 +81,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,7 +93,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     GoogleApiClient mGoogleApiClient;
     LocationRequest locationRequest;
     String id = "id";
-    String rand = Integer.toString((int) (Math.random()*10000));
+    String rand = UUID.randomUUID().toString();
     boolean talkadd = false;
     boolean voiceopen = false;
     boolean livestart = false;
@@ -570,7 +571,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String dellive=liverand;
         String delfix="marker-"+rand;
         deleteTask.executeOnExecutor(THREAD_POOL_EXECUTOR,dellive,delfix);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
-        rand = Integer.toString((int) (Math.random()*10000));
+        rand = UUID.randomUUID().toString();
     }
 
     public class LiveTask extends AsyncTask<Void, Void, Void>{
