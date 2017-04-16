@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.github.faucamp.simplertmp.RtmpHandler;
@@ -50,6 +51,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,10 +65,14 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 
     boolean save;
 
-    Button btnPublish = null;
-    Button btnSwitchCamera = null;
-    Button btnRecord = null;
-    Button btnSwitchEncoder = null;
+    ImageButton btnPublishstop = null;
+    ImageButton btnPublish = null;
+    ImageButton btnSwitchCamera = null;
+    ImageButton btnSave = null;
+    ImageButton btnSaveConti = null;
+    ImageButton btnSaveStop = null;
+
+//    Button btnSwitchEncoder = null;
 
     private SharedPreferences sp;
     private String rtmpUrl = "rtmp://ossrs.net/" + getRandomAlphaString(3) + '/' + getRandomAlphaDigitString(5);
@@ -99,9 +105,9 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         }else{
             Log.d("values", "asasas");
         }
-        if (intent.hasExtra("save")) {
-            save = intent.getBooleanExtra("save", false);
-        }
+//        if (intent.hasExtra("save")) {
+//            save = intent.getBooleanExtra("save", false);
+//        }
 
         //LocationSync
         LocationSync update = new LocationSync();
@@ -112,54 +118,101 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         // initialize url.
         final EditText efu = (EditText) findViewById(R.id.url);
         efu.setText(rtmpUrl);
-        btnPublish = (Button) findViewById(R.id.publish);
-        btnSwitchCamera = (Button) findViewById(R.id.swCam);
-        btnRecord = (Button) findViewById(R.id.record);
-        btnSwitchEncoder = (Button) findViewById(R.id.swEnc);
+        btnPublishstop = (ImageButton) findViewById(R.id.publishstop);
+        btnPublish = (ImageButton)findViewById(R.id.publish);
+        btnSwitchCamera = (ImageButton) findViewById(R.id.swCam);
+        btnSave = (ImageButton) findViewById(R.id.save);
+        btnSaveConti = (ImageButton) findViewById(R.id.saveconti);
+        btnSaveStop = (ImageButton) findViewById(R.id.savestop);
+//        btnSwitchEncoder = (Button) findViewById(R.id.swEnc);
 
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.preview));
         mPublisher.setEncodeHandler(new SrsEncodeHandler(this));
         mPublisher.setRtmpHandler(new RtmpHandler(this));
         mPublisher.setRecordHandler(new SrsRecordHandler(this));
 
+        //language settings
+        String language= Locale.getDefault().getDisplayLanguage();
+        if(language.equals("中文")){
+            btnPublishstop.setImageResource(R.drawable.livestopch);
+            btnPublish.setImageResource(R.drawable.livecontich);
+            btnSwitchCamera.setImageResource(R.drawable.switchch);
+            btnSave.setImageResource(R.drawable.savech);
+            btnSaveConti.setImageResource(R.drawable.savecontich);
+            btnSaveStop.setImageResource(R.drawable.savestopch);
+        }
+
+        //button onclick control
+        btnPublishstop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //stop live streaming
+                mPublisher.stopPublish();
+                mPublisher.stopRecord();
+                btnPublishstop.setVisibility(View.INVISIBLE);
+                btnPublish.setVisibility(View.VISIBLE);
+                btnSaveStop.setVisibility(View.INVISIBLE);
+                btnSaveConti.setVisibility(View.INVISIBLE);
+                btnSave.setVisibility(View.VISIBLE);
+
+//                btnRecord.setText("record");
+//                btnSwitchEncoder.setEnabled(true);
+
+//                if (btnPublish.getText().toString().contentEquals("publish")) {
+//                    rtmpUrl = efu.getText().toString();
+//                    SharedPreferences.Editor editor = sp.edit();
+//                    editor.putString("rtmpUrl", rtmpUrl);
+//                    editor.apply();
+//
+//                    mPublisher.setPreviewResolution(1280, 720);
+//                    mPublisher.setOutputResolution(384, 640);
+//                    mPublisher.setVideoSmoothMode();
+//                    mPublisher.startPublish(rtmpUrl);
+//
+//                    if(save){
+//                        mPublisher.startRecord(recPath);
+//                    }
+//
+////                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+////                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+////                    } else {
+////                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+////                    }
+//                    btnPublish.setText("stop");
+//                    btnSwitchEncoder.setEnabled(false);
+//                }else if(btnPublish.getText().toString().contentEquals("stop")){
+//                    mPublisher.stopPublish();
+//                    mPublisher.stopRecord();
+//                    //StopTask stop = new StopTask();
+//                   // stop.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
+//                    btnPublish.setText("publish");
+//                    btnRecord.setText("record");
+//                    btnSwitchEncoder.setEnabled(true);
+//                    //回到地圖
+//                    //Intent intent;
+//                    //intent = new Intent(CameraActivity.this, MapsActivity.class);
+//                    //startActivity(intent);
+//                }
+            }
+        });
+
         btnPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnPublish.getText().toString().contentEquals("publish")) {
-                    rtmpUrl = efu.getText().toString();
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("rtmpUrl", rtmpUrl);
-                    editor.apply();
+                rtmpUrl = efu.getText().toString();
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("rtmpUrl", rtmpUrl);
+                editor.apply();
 
-                    mPublisher.setPreviewResolution(1280, 720);
-                    mPublisher.setOutputResolution(384, 640);
-                    mPublisher.setVideoSmoothMode();
-                    mPublisher.startPublish(rtmpUrl);
+                mPublisher.setPreviewResolution(1280, 720);
+                mPublisher.setOutputResolution(384, 640);
+                mPublisher.setVideoSmoothMode();
+                mPublisher.startPublish(rtmpUrl);
 
-                    if(save){
-                        mPublisher.startRecord(recPath);
-                    }
-
-//                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-//                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
-//                    }
-                    btnPublish.setText("stop");
-                    btnSwitchEncoder.setEnabled(false);
-                }else if(btnPublish.getText().toString().contentEquals("stop")){
-                    mPublisher.stopPublish();
-                    mPublisher.stopRecord();
-                    //StopTask stop = new StopTask();
-                   // stop.executeOnExecutor(THREAD_POOL_EXECUTOR,marker_id);
-                    btnPublish.setText("publish");
-                    btnRecord.setText("record");
-                    btnSwitchEncoder.setEnabled(true);
-                    //回到地圖
-                    //Intent intent;
-                    //intent = new Intent(CameraActivity.this, MapsActivity.class);
-                    //startActivity(intent);
-                }
+                btnPublish.setVisibility(View.INVISIBLE);
+                btnPublishstop.setVisibility(View.VISIBLE);
+//                btnSwitchEncoder.setEnabled(false);
             }
         });
 
@@ -172,34 +225,61 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             }
         });
 
-        btnRecord.setOnClickListener(new View.OnClickListener() {
+//        btnRecord.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (btnRecord.getText().toString().contentEquals("record")) {
+//                    mPublisher.startRecord(recPath);
+//                    btnRecord.setText("pause");
+//                } else if (btnRecord.getText().toString().contentEquals("pause")) {
+//                    mPublisher.pauseRecord();
+//                    btnRecord.setText("resume");
+//                } else if (btnRecord.getText().toString().contentEquals("resume")) {
+//                    mPublisher.resumeRecord();
+//                    btnRecord.setText("pause");
+//                }
+//            }
+//        });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnRecord.getText().toString().contentEquals("record")) {
-                    mPublisher.startRecord(recPath);
-                    btnRecord.setText("pause");
-                } else if (btnRecord.getText().toString().contentEquals("pause")) {
-                    mPublisher.pauseRecord();
-                    btnRecord.setText("resume");
-                } else if (btnRecord.getText().toString().contentEquals("resume")) {
-                    mPublisher.resumeRecord();
-                    btnRecord.setText("pause");
-                }
+                mPublisher.startRecord(recPath);
+                btnSave.setVisibility(View.INVISIBLE);
+                btnSaveStop.setVisibility(View.VISIBLE);
             }
         });
 
-        btnSwitchEncoder.setOnClickListener(new View.OnClickListener() {
+        btnSaveStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-                    mPublisher.swithToSoftEncoder();
-                    btnSwitchEncoder.setText("hard encoder");
-                } else if (btnSwitchEncoder.getText().toString().contentEquals("hard encoder")) {
-                    mPublisher.swithToHardEncoder();
-                    btnSwitchEncoder.setText("soft encoder");
-                }
+                mPublisher.pauseRecord();
+                btnSaveStop.setVisibility(View.INVISIBLE);
+                btnSaveConti.setVisibility(View.VISIBLE);
             }
         });
+
+        btnSaveConti.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPublisher.resumeRecord();
+                btnSaveConti.setVisibility(View.INVISIBLE);
+                btnSaveStop.setVisibility(View.VISIBLE);
+            }
+        });
+
+//        btnSwitchEncoder.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+//                    mPublisher.swithToSoftEncoder();
+//                    btnSwitchEncoder.setText("hard encoder");
+//                } else if (btnSwitchEncoder.getText().toString().contentEquals("hard encoder")) {
+//                    mPublisher.swithToHardEncoder();
+//                    btnSwitchEncoder.setText("soft encoder");
+//                }
+//            }
+//        });
 
         //publish
         rtmpUrl = efu.getText().toString();
@@ -212,9 +292,9 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         mPublisher.setVideoSmoothMode();
         mPublisher.startPublish(rtmpUrl);
 
-        if(save){
-            mPublisher.startRecord(recPath);
-        }
+//        if(save){
+//            mPublisher.startRecord(recPath);
+//        }
 
 //        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
 //            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
@@ -222,8 +302,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 //            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
 //        }
 
-        btnPublish.setText("stop");
-        btnSwitchEncoder.setEnabled(false);
+//        btnSwitchEncoder.setEnabled(false);
 
     }
 
@@ -252,7 +331,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
     @Override
     protected void onResume() {
         super.onResume();
-        final Button btn = (Button) findViewById(R.id.publish);
+        final ImageButton btn = (ImageButton) findViewById(R.id.publish);
         btn.setEnabled(true);
         mPublisher.resumeRecord();
     }
@@ -275,9 +354,12 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         super.onConfigurationChanged(newConfig);
         mPublisher.stopEncode();
         mPublisher.stopRecord();
-        btnRecord.setText("record");
+//        btnRecord.setText("record");
+        btnSaveConti.setVisibility(View.INVISIBLE);
+        btnSaveStop.setVisibility(View.INVISIBLE);
+        btnSave.setVisibility(View.VISIBLE);
         mPublisher.setScreenOrientation(newConfig.orientation);
-        if (btnPublish.getText().toString().contentEquals("stop")) {
+        if (btnPublishstop.getVisibility() == View.VISIBLE) {
             mPublisher.startEncode();
         }
     }
@@ -309,9 +391,15 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             mPublisher.stopPublish();
             mPublisher.stopRecord();
-            btnPublish.setText("publish");
-            btnRecord.setText("record");
-            btnSwitchEncoder.setEnabled(true);
+            btnPublishstop.setVisibility(View.INVISIBLE);
+            btnPublish.setVisibility(View.VISIBLE);
+
+            btnSaveConti.setVisibility(View.INVISIBLE);
+            btnSaveStop.setVisibility(View.INVISIBLE);
+            btnSave.setVisibility(View.VISIBLE);
+//            btnPublish.setText("publish");
+//            btnRecord.setText("record");
+//            btnSwitchEncoder.setEnabled(true);
         } catch (Exception e1) {
             // Ignore
         }

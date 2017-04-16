@@ -16,41 +16,94 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/publish"
-        android:id="@+id/publish"
+    <ImageButton
+        android:text="stop"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:id="@+id/publishstop"
+        android:src="@drawable/livestop"
+        android:background="@null"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        />
+        android:visibility="visible"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/switches"
+    <ImageButton
+        android:text="publish"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:id="@+id/publish"
+        android:src="@drawable/liveconti"
+        android:background="@null"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="invisible"/>
+
+    <ImageButton
+        android:text="switch"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
         android:id="@+id/swCam"
-        android:layout_alignBottom="@+id/publish"
-        android:layout_toRightOf="@+id/publish" />
+        android:src="@drawable/switchen"
+        android:background="@null"
+        android:visibility="visible"
+        android:layout_alignTop="@+id/publishstop"
+        android:layout_toRightOf="@+id/publishstop"
+        android:layout_toEndOf="@+id/publishstop" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/record"
-        android:id="@+id/record"
-        android:layout_alignBottom="@+id/publish"
-        android:layout_toRightOf="@id/swCam" />
+    <ImageButton
+        android:text="save"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:id="@+id/save"
+        android:src="@drawable/save"
+        android:background="@null"
+        android:visibility="visible"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/swCam"
+        android:layout_toEndOf="@+id/swCam" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/soft_encoder"
-        android:id="@+id/swEnc"
-        android:layout_alignBottom="@+id/publish"
-        android:layout_toRightOf="@id/record"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+    <ImageButton
+        android:text="save"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:id="@+id/saveconti"
+        android:src="@drawable/saveconti"
+        android:background="@null"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/swCam"
+        android:layout_toEndOf="@+id/swCam" />
+
+    <ImageButton
+        android:text="save"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:id="@+id/savestop"
+        android:src="@drawable/savestop"
+        android:background="@null"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/swCam"
+        android:layout_toEndOf="@+id/swCam" />
+
+
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/soft_encoder"-->
+        <!--android:id="@+id/swEnc"-->
+        <!--android:layout_alignBottom="@+id/publish"-->
+        <!--android:layout_toRightOf="@id/record"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentEnd="true"/>-->
 
     <EditText
         android:layout_width="wrap_content"
