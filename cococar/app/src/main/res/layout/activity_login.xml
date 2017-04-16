@@ -31,6 +31,7 @@
         android:id="@+id/enterid"
         android:hint="yourID"
         android:textColorHint="@drawable/pink"
+        android:textColor="@drawable/white"
         android:layout_marginBottom="17dp"
         android:layout_above="@+id/fuckyou"
         android:layout_alignLeft="@+id/fb_login_bn"

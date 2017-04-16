@@ -133,7 +133,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         voice= (ImageButton) findViewById(R.id.voice);
         logout= (ImageButton) findViewById(R.id.logout);
         if(language.equals("中文")){
-            startlive.setImageResource(R.drawable.startlivech);
+            startlive.setImageResource(R.drawable.startch);
             voice.setImageResource(R.drawable.voicech);
             logout.setImageResource(R.drawable.logoutch);
         }
