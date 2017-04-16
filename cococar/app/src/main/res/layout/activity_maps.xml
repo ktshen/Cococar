@@ -67,7 +67,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/startliveen"
+        android:src="@drawable/starten"
         />
 
     <ImageButton
