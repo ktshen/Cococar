@@ -122,28 +122,6 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         mPublisher.setRtmpHandler(new RtmpHandler(this));
         mPublisher.setRecordHandler(new SrsRecordHandler(this));
 
-        rtmpUrl = efu.getText().toString();
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString("rtmpUrl", rtmpUrl);
-        editor.apply();
-
-        mPublisher.setPreviewResolution(1280, 720);
-        mPublisher.setOutputResolution(384, 640);
-        mPublisher.setVideoSmoothMode();
-        mPublisher.startPublish(rtmpUrl);
-
-//        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-//            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
-//        }
-        btnPublish.setText("stop");
-        btnSwitchEncoder.setEnabled(false);
-
-        if(save){
-            mPublisher.startRecord(recPath);
-        }
-
         btnPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,11 +136,15 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
                     mPublisher.setVideoSmoothMode();
                     mPublisher.startPublish(rtmpUrl);
 
-                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
-                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+                    if(save){
+                        mPublisher.startRecord(recPath);
                     }
+
+//                    if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+//                        Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+//                    }
                     btnPublish.setText("stop");
                     btnSwitchEncoder.setEnabled(false);
                 }else if(btnPublish.getText().toString().contentEquals("stop")){
@@ -218,6 +200,31 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
                 }
             }
         });
+
+        //publish
+        rtmpUrl = efu.getText().toString();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("rtmpUrl", rtmpUrl);
+        editor.apply();
+
+        mPublisher.setPreviewResolution(1280, 720);
+        mPublisher.setOutputResolution(384, 640);
+        mPublisher.setVideoSmoothMode();
+        mPublisher.startPublish(rtmpUrl);
+
+        if(save){
+            mPublisher.startRecord(recPath);
+        }
+
+//        if (btnSwitchEncoder.getText().toString().contentEquals("soft encoder")) {
+//            Toast.makeText(getApplicationContext(), "Use hard encoder", Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(getApplicationContext(), "Use soft encoder", Toast.LENGTH_SHORT).show();
+//        }
+
+        btnPublish.setText("stop");
+        btnSwitchEncoder.setEnabled(false);
+
     }
 
     @Override

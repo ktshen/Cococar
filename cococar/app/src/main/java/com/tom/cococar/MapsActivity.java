@@ -108,7 +108,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     String liverand="";
     String fixrand="";
     String strAddress="";
-    boolean savefilm = false;
 
     //聲控
     private SpeechRecognizer recognizer;
@@ -130,21 +129,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         id=intent.getStringExtra("id");
         e_address= (EditText) findViewById(R.id.address);
         edtalk = (EditText) findViewById(R.id.ed_talk);
-        submit = (ImageButton) findViewById(R.id.submit);
-        delete=(ImageButton)findViewById(R.id.delete);
-        save= (ImageButton) findViewById(R.id.save);
         startlive= (ImageButton) findViewById(R.id.startlive);
         voice= (ImageButton) findViewById(R.id.voice);
         logout= (ImageButton) findViewById(R.id.logout);
-        search= (ImageButton) findViewById(R.id.search);
         if(language.equals("中文")){
-            submit.setImageResource(R.drawable.submitch);
-            delete.setImageResource(R.drawable.deletech);
-            save.setImageResource(R.drawable.savech);
-            startlive.setImageResource(R.drawable.livech);
+            startlive.setImageResource(R.drawable.startlivech);
             voice.setImageResource(R.drawable.voicech);
             logout.setImageResource(R.drawable.logoutch);
-            search.setImageResource(R.drawable.searchch);
         }
 
 
@@ -370,19 +361,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         }
     }
 
-    public void save(View view){
-        if(!savefilm){
-            //開啟儲存
-            savefilm = true;
-            Toast toast = Toast.makeText(this, "Open save control", Toast.LENGTH_SHORT);
-            toast.show();
-        }else{
-            //關閉儲存
-            savefilm = false;
-            Toast toast = Toast.makeText(this, "Close save control", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
 
     public void live_button(View view) {
         live();
@@ -592,6 +570,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String dellive=liverand;
         String delfix="marker-"+rand;
         deleteTask.executeOnExecutor(THREAD_POOL_EXECUTOR,dellive,delfix);//AsyncTask 提供了 execute 方法來執行(觸發)非同步工作
+        rand = Integer.toString((int) (Math.random()*10000));
     }
 
     public class LiveTask extends AsyncTask<Void, Void, Void>{
@@ -681,13 +660,13 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         String provider = locationManager.getBestProvider(criteria, true);
         //noinspection MissingPermission
         Location location = locationManager.getLastKnownLocation("network");
-        if (location != null) {
-            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
-            mMap.addMarker(new MarkerOptions()
-                    .position(Now)
-                    .title("Current Position"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
-        }
+//        if (location != null) {
+//            LatLng Now = new LatLng(location.getLatitude(),location.getLongitude());
+//            mMap.addMarker(new MarkerOptions()
+//                    .position(Now)
+//                    .title("Current Position"));
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Now, 12));
+//        }
         liverand = "user-"+rand;
         url1=url1+liverand;
         Log.d("bg", url1);
@@ -701,7 +680,6 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("marker_id", liverand);
-        intent.putExtra("save", savefilm);
         Log.d("janices", "in back 3");
         startActivity(intent);
 

@@ -22,89 +22,81 @@
         android:layout_height="wrap_content"
         android:id="@+id/search"
         android:onClick="search"
+        android:src="@drawable/ic_search"
+        android:background="@null"
         android:layout_above="@+id/submit"
-        android:layout_alignLeft="@+id/delete"
-        android:layout_alignStart="@+id/delete"
-        android:src="@drawable/searchen"
-        />
+        android:layout_alignRight="@+id/delete"
+        android:layout_alignEnd="@+id/delete" />
 
     <ImageButton
         android:text="log out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
         android:id="@+id/logout"
         android:onClick="log_out"
-        android:layout_below="@+id/save"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:background="@null"
         android:src="@drawable/logouten"
-        />
+        android:layout_below="@+id/voice"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ImageButton
         android:text="voice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
         android:id="@+id/voice"
         android:onClick="voice"
+        android:background="@null"
         android:layout_below="@+id/startlive"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:src="@drawable/voiceen"
         />
 
-    <ImageButton
-        android:text="save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/save"
-        android:onClick="save"
-        android:layout_below="@+id/voice"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/saveen"
 
-        />
-
-    <ImageButton android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
         android:text="start live"
         android:onClick="live_button"
+        android:background="@null"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/startlive"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/liveen"
+        android:src="@drawable/startliveen"
         />
 
     <ImageButton
-        android:text="submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/submit"
-        android:onClick="submit"
-        android:layout_alignBottom="@+id/ed_talk"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="94dp"
-        android:layout_marginEnd="94dp"
-        android:src="@drawable/submiten"
-        />
-
-    <ImageButton
-        android:text="delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="11dp"
-        android:layout_marginEnd="11dp"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:cropToPadding="false"
+        android:onClick="submit"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_return"
+        android:text="submit"
+        android:layout_alignTop="@+id/ed_talk"
+        android:layout_toRightOf="@+id/ed_talk" />
+
+    <ImageButton
         android:id="@+id/delete"
-        android:layout_alignBaseline="@+id/submit"
-        android:layout_alignBottom="@+id/submit"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:cropToPadding="false"
         android:onClick="delete"
-        android:src="@drawable/deleteen"
-        />
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_delete"
+        android:text="delete"
+        android:layout_below="@+id/address"
+        android:layout_toRightOf="@+id/submit" />
 
 
     <EditText
@@ -124,14 +116,14 @@
         android:id="@+id/address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/ed_talk"
-        android:layout_alignEnd="@+id/submit"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/submit"
         android:ems="10"
         android:hint="@string/address_or_location"
         android:inputType="textPersonName"
-        tools:text="@string/address" />
+        tools:text="@string/address"
+        android:layout_above="@+id/submit"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/search"
+        android:layout_toStartOf="@+id/search" />
 
 </RelativeLayout>
