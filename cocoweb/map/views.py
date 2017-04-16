@@ -116,9 +116,13 @@ def search_record(request):
 
 @csrf_exempt
 def video(request):
-    marker = request.POST["marker_id"]
-    m3u8_path = os.path.join(m3u8_base, marker, "index.m3u8")
-    return render(request, "hls.html", context={"hls_url": m3u8_path})
+    marker_id = request.POST["marker_id"]
+    if "user" not in marker_id:
+        return HttpResponse(status=400)
+    marker = get_object_or_404(Marker, marker_id=marker_id)
+    m3u8_path = os.path.join(m3u8_base, marker_id, "index.m3u8")
+    return render(request, "hls.html", context={"hls_url": m3u8_path,
+                                                "live-ing": True if marker.live_ending_time else False})
 
 
 @csrf_exempt
