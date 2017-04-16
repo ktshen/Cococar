@@ -681,6 +681,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("marker_id", liverand);
+        intent.putExtra("voice",voiceopen);
         Log.d("janices", "in back 3");
         startActivity(intent);
 

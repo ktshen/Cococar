@@ -13,6 +13,10 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +55,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -63,7 +68,7 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
 
     public Date d = new Date();
 
-    boolean save;
+    boolean voice;
 
     ImageButton btnPublishstop = null;
     ImageButton btnPublish = null;
@@ -71,6 +76,11 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
     ImageButton btnSave = null;
     ImageButton btnSaveConti = null;
     ImageButton btnSaveStop = null;
+
+    //聲控
+    private SpeechRecognizer recognizer;
+    private Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+    final Handler handler = new Handler();
 
 //    Button btnSwitchEncoder = null;
 
@@ -105,6 +115,10 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         }else{
             Log.d("values", "asasas");
         }
+        if(intent.hasExtra("voice")){
+            voice = intent.getBooleanExtra("voice",false);
+            Log.d("COCO","voice"+voice);
+        }
 //        if (intent.hasExtra("save")) {
 //            save = intent.getBooleanExtra("save", false);
 //        }
@@ -131,6 +145,11 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         mPublisher.setRtmpHandler(new RtmpHandler(this));
         mPublisher.setRecordHandler(new SrsRecordHandler(this));
 
+        //聲控
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        recognizer.setRecognitionListener(new CameraActivity.MyRecognizerListener());
+
         //language settings
         String language= Locale.getDefault().getDisplayLanguage();
         if(language.equals("中文")){
@@ -140,6 +159,14 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
             btnSave.setImageResource(R.drawable.savech);
             btnSaveConti.setImageResource(R.drawable.savecontich);
             btnSaveStop.setImageResource(R.drawable.savestopch);
+        }
+
+        if(voice){
+            recognizer.startListening(intent);
+            Log.d("COCO","voice start");
+        }else{
+            recognizer.stopListening();
+            Log.d("COCO","voice stop");
         }
 
         //button onclick control
@@ -621,5 +648,114 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
         }
 
     }
+
+    //聲控
+    private class MyRecognizerListener implements RecognitionListener {
+
+        @Override
+        public void onResults(Bundle results) {
+            List<String> resList = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            if(resList.get(0).equals("繼續直播") || resList.get(0).equals("Resume")) {
+                //TODO
+                Log.d("COCO","voice resume");
+
+                mPublisher.setPreviewResolution(1280, 720);
+                mPublisher.setOutputResolution(384, 640);
+                mPublisher.setVideoSmoothMode();
+                mPublisher.startPublish(rtmpUrl);
+
+                btnPublish.setVisibility(View.INVISIBLE);
+                btnPublishstop.setVisibility(View.VISIBLE);
+
+            }
+            else if(resList.get(0).equals("暫停直播") || resList.get(0).equals("Stop")) {
+                //TODO
+                Log.d("COCO","voice Stop");
+                //stop live streaming
+                mPublisher.stopPublish();
+                mPublisher.stopRecord();
+                btnPublishstop.setVisibility(View.INVISIBLE);
+                btnPublish.setVisibility(View.VISIBLE);
+                btnSaveStop.setVisibility(View.INVISIBLE);
+                btnSaveConti.setVisibility(View.INVISIBLE);
+                btnSave.setVisibility(View.VISIBLE);
+
+            }
+            else if(resList.get(0).equals("儲存影片") || resList.get(0).equals("Save")) {
+                //TODO
+                Log.d("COCO","voice Save");
+                mPublisher.startRecord(recPath);
+                btnSave.setVisibility(View.INVISIBLE);
+                btnSaveStop.setVisibility(View.VISIBLE);
+
+            }
+            else if(resList.get(0).equals("繼續儲存") || resList.get(0).equals("Resume Saving")) {
+                //TODO
+                Log.d("COCO","voice Resume Saving");
+                mPublisher.resumeRecord();
+                btnSaveConti.setVisibility(View.INVISIBLE);
+                btnSaveStop.setVisibility(View.VISIBLE);
+            }
+            else if(resList.get(0).equals("暫停儲存") || resList.get(0).equals("Pause Saving")) {
+                //TODO
+                Log.d("COCO","voice Pause Saving");
+                mPublisher.pauseRecord();
+                btnSaveStop.setVisibility(View.INVISIBLE);
+                btnSaveConti.setVisibility(View.VISIBLE);
+
+            }
+            else if(resList.get(0).equals("轉換鏡頭") || resList.get(0).equals("Switch")) {
+                //TODO
+                Log.d("COCO","voice Switch");
+                if (Camera.getNumberOfCameras() > 0) {
+                    mPublisher.switchCameraFace((mPublisher.getCamraId() + 1) % Camera.getNumberOfCameras());
+                }
+
+            }
+            else
+                Log.d("COCO","voice nnnnnnnnnn");
+        }
+
+        @Override
+        public void onError(int error) {
+            Log.d("COCO",error+" voice ");
+        }
+
+        @Override
+        public void onReadyForSpeech(Bundle params) {
+        }
+
+        @Override
+        public void onBeginningOfSpeech() {
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+        }
+
+        @Override
+        public void onBufferReceived(byte[] buffer) {
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+            Log.d("COCO","voice runnable");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    recognizer.startListening(intent);
+                }
+            }, 500);
+        }
+
+        @Override
+        public void onPartialResults(Bundle partialResults) {
+        }
+
+        @Override
+        public void onEvent(int eventType, Bundle params) {
+        }
+    }
+
 }
 
