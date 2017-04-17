@@ -16,12 +16,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/fb_login_bn"
-        android:layout_marginRight="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_below="@+id/fuckyou"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="95dp"></com.facebook.login.widget.LoginButton>
+        android:layout_marginTop="77dp"
+        android:layout_below="@+id/enter"
+        android:layout_centerHorizontal="true"></com.facebook.login.widget.LoginButton>
 
     <EditText
         android:layout_width="wrap_content"
@@ -30,51 +27,22 @@
         android:ems="10"
         android:id="@+id/enterid"
         android:hint="yourID"
-        android:textColorHint="@drawable/pink"
-        android:textColor="@drawable/white"
-        android:layout_marginBottom="17dp"
-        android:layout_above="@+id/fuckyou"
-        android:layout_alignLeft="@+id/fb_login_bn"
-        android:layout_alignStart="@+id/fb_login_bn" />
+        android:layout_marginTop="209dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/enter"
+        android:layout_toStartOf="@+id/enter" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/please_enter_your_id"
-        android:textColor="@drawable/papayawhip"
-        android:textSize="18sp"
-        android:layout_above="@+id/enterid"
-        android:layout_alignLeft="@+id/enterid"
-        android:layout_alignStart="@+id/enterid"
-        android:layout_marginBottom="13dp" />
 
     <ImageButton
-        android:id="@+id/fuckyou"
+        android:id="@+id/enter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="enter"
-        android:src="@drawable/benter"
+        android:src="@drawable/ic_return"
         android:background = "@null"
-        android:layout_marginRight="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="----or----"
-        android:textColor="@drawable/papayawhip"
-        android:textSize="24sp"
-        android:layout_marginTop="26dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_below="@+id/fuckyou"
-        android:layout_alignRight="@+id/fuckyou"
-        android:layout_alignEnd="@+id/fuckyou" />
+        android:layout_alignTop="@+id/enterid"
+        android:layout_toRightOf="@+id/fb_login_bn"
+        android:layout_toEndOf="@+id/fb_login_bn" />
 
 
 </RelativeLayout>
