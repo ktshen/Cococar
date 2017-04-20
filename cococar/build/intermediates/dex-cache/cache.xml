@@ -3,30 +3,21 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\Katherine\Desktop\k\Cococar\cococar\giraffeplayer\build\intermediates\bundles\default\classes.jar"
-        jumboMode="false"
+        jar="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="04552cc505baae7ea1ab982f1cc78d60b6ec6ef0">
-        <dex dex="C:\Users\Katherine\Desktop\k\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_eb43bc4c2fce00e96cfab963e6246bb6da7f9a50\classes.dex" />
+        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
+        <dex dex="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_7d1ddc729e6dc639448f0b264192dfb2865e9f92\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Katherine\Desktop\k\Cococar\cococar\yasea\build\intermediates\bundles\default\classes.jar"
-        jumboMode="false"
+        jar="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="cab6f40943fd9629fd262f1b3fd887239c119150">
-        <dex dex="C:\Users\Katherine\Desktop\k\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_b06eb73a80a4191a3e62fa49e12e6b58d3d5be27\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Katherine\Desktop\k\Cococar\cococar\ijkplayer-java\build\intermediates\bundles\default\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="25.0.0"
-        sha1="91fe42f1dc6f91c04c1dd3e21d60ddcb84803918">
-        <dex dex="C:\Users\Katherine\Desktop\k\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_ebfc6279ce956a7851e64aa2a94c271fb3f46818\classes.dex" />
+        sha1="8b5133a2e0611f6c19904c8005e06c1850fab3b6">
+        <dex dex="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_806ce69c27cc9093880d7186cb00d8c6e5ff672b\classes.dex" />
     </item>
 
 </items>
