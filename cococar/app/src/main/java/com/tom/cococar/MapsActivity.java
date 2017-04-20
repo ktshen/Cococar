@@ -109,6 +109,10 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     String liverand="";
     String fixrand="";
     String strAddress="";
+    private ArrayList<LatLng> markerPoints;
+    private Context context;
+    public static double latitude_in;
+    public static double longitude_in;
 
     //聲控
     private SpeechRecognizer recognizer;
@@ -162,6 +166,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         update.executeOnExecutor(THREAD_POOL_EXECUTOR);
         LiveTask live = new LiveTask();
         live.executeOnExecutor(THREAD_POOL_EXECUTOR);
+        context = this;
     }
 
     private void createLocationRequest() {
@@ -307,6 +312,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     }
 
     public void search(View view){
+       markerPoints=new ArrayList<LatLng>();
         if(!e_address.getText().toString().isEmpty()) {
             strAddress = e_address.getText().toString();
             try {
@@ -318,6 +324,22 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 Log.d("緯度", "=" + latitude);
                 LatLng Search = new LatLng(latitude, longitude);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 18));
+                if(talkadd==true){
+                    LatLng STATION1 = new LatLng(latitude_in, longitude_in);
+                    LatLng STATION = new LatLng(latitude,longitude);
+                    Log.d("nnnnnnnnnnnn1","nav");
+                    markerPoints.add(0,STATION1);//private ArrayList<LatLng> markerPoints;
+                    markerPoints.add(1,STATION);//private ArrayList<LatLng> markerPoints;
+                    Log.d("nnnnnnnnnnnn2","nav");
+                    mMap.addMarker(new MarkerOptions()
+                            .position(STATION));
+                    Log.d("nnnnnnnnnnnn3","nav");
+                    Directions.getInstance().draw(context, markerPoints.get(0),
+                            markerPoints.get(1), mMap, Directions.MODE_DRIVING);
+                    Log.d("nnnnnnnnnnnn4","nav");
+
+
+                }
             } catch (IOException e) {
             }
             e_address.getText().clear();
@@ -547,6 +569,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
             Log.d("qwerstimmy", ""+talkadd);
             String longitude = String.valueOf(location.getLongitude());
             String latitude = String.valueOf(location.getLatitude());
+            latitude_in = Double.parseDouble(latitude);
+            longitude_in = Double.parseDouble(longitude);
             BackgroundTask backgroundTask = new BackgroundTask(this);
             Log.d("qwer", id);
             Log.d("qwer", longitude);
