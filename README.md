@@ -4,9 +4,9 @@
 Google map providing live streaming of users' road condition and combining with social community.
 
 # Welcome To Cococar
-一起在地圖上直播吧！
-Cococar 是一個社群地圖，讓你在世界上任何位置都可以直播、分享、和標記自己的路況資訊和交通事件，用最新的科技讓交通進化。
----
+#### 一起在地圖上直播吧！
+#### Cococar 是一個社群地圖，讓你在世界上任何位置都可以直播、分享、和標記自己的路況資訊和交通事件，用最新的科技讓交通進化。
+
 
 # DEMO
  Demo： http://140.115.158.81/cococar/
