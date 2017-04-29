@@ -3,21 +3,30 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
-        jumboMode="true"
+        jar="C:\Users\Katherine\Desktop\final\Cococar\cococar\yasea\build\intermediates\bundles\default\classes.jar"
+        jumboMode="false"
         optimize="true"
         revision="25.0.0"
-        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
-        <dex dex="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_7d1ddc729e6dc639448f0b264192dfb2865e9f92\classes.dex" />
+        sha1="cab6f40943fd9629fd262f1b3fd887239c119150">
+        <dex dex="C:\Users\Katherine\Desktop\final\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_c59621d1fcd059fbf643488c45e73bb8d0d1bff7\classes.dex" />
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
+        jar="C:\Users\Katherine\Desktop\final\Cococar\cococar\ijkplayer-java\build\intermediates\bundles\default\classes.jar"
+        jumboMode="false"
         optimize="true"
         revision="25.0.0"
-        sha1="8b5133a2e0611f6c19904c8005e06c1850fab3b6">
-        <dex dex="C:\Users\timmy\Desktop\comm\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_806ce69c27cc9093880d7186cb00d8c6e5ff672b\classes.dex" />
+        sha1="91fe42f1dc6f91c04c1dd3e21d60ddcb84803918">
+        <dex dex="C:\Users\Katherine\Desktop\final\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_ff29ce6dc02e00c39d12ad637ac66270335187db\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Katherine\Desktop\final\Cococar\cococar\giraffeplayer\build\intermediates\bundles\default\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.0"
+        sha1="04552cc505baae7ea1ab982f1cc78d60b6ec6ef0">
+        <dex dex="C:\Users\Katherine\Desktop\final\Cococar\cococar\app\build\intermediates\transforms\dex\debug\folders\1000\4\classes_13987890f13f8965d5fa2d123ab386fb9aeae5b1\classes.dex" />
     </item>
 
 </items>

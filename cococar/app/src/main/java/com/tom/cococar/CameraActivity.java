@@ -617,6 +617,8 @@ public class CameraActivity extends Activity implements RtmpHandler.RtmpListener
                                 "\", \"latitude\": \"" + latitude +
                                 "\"}";
 
+                        Log.d("aaaaaaa",data);
+
 //                        String data =
 //                                URLEncoder.encode("longitude", "UTF-8") + "=" + URLEncoder.encode(longitude, "UTF-8") + "&" +
 //                                        URLEncoder.encode("latitude", "UTF-8") + "=" + URLEncoder.encode(latitude, "UTF-8") + "&" +

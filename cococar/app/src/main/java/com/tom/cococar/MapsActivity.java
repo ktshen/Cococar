@@ -113,6 +113,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     private Context context;
     public static double latitude_in;
     public static double longitude_in;
+    Marker navmarker;
+    boolean nav = false;
 
     //聲控
     private SpeechRecognizer recognizer;
@@ -313,6 +315,9 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
 
     public void search(View view){
        markerPoints=new ArrayList<LatLng>();
+        if(nav){
+            mMap.clear();
+            nav = false;}
         if(!e_address.getText().toString().isEmpty()) {
             strAddress = e_address.getText().toString();
             try {
@@ -324,22 +329,32 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 Log.d("緯度", "=" + latitude);
                 LatLng Search = new LatLng(latitude, longitude);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Search, 18));
-                if(talkadd==true){
-                    LatLng STATION1 = new LatLng(latitude_in, longitude_in);
-                    LatLng STATION = new LatLng(latitude,longitude);
-                    Log.d("nnnnnnnnnnnn1","nav");
-                    markerPoints.add(0,STATION1);//private ArrayList<LatLng> markerPoints;
-                    markerPoints.add(1,STATION);//private ArrayList<LatLng> markerPoints;
-                    Log.d("nnnnnnnnnnnn2","nav");
-                    mMap.addMarker(new MarkerOptions()
-                            .position(STATION));
-                    Log.d("nnnnnnnnnnnn3","nav");
-                    Directions.getInstance().draw(context, markerPoints.get(0),
-                            markerPoints.get(1), mMap, Directions.MODE_DRIVING);
-                    Log.d("nnnnnnnnnnnn4","nav");
 
+                // 透過位置服務，取得目前裝置所在
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                // 設定標準為存取精確
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
+                String provider = locationManager.getBestProvider(criteria, true);
+                //noinspection MissingPermission
+                Location navlocation = locationManager.getLastKnownLocation(provider);
 
-                }
+                LatLng STATION1 = new LatLng(navlocation.getLatitude(), navlocation.getLongitude());
+                LatLng STATION = new LatLng(latitude,longitude);
+                Log.d("nnnnnnnnnnnn1","nav");
+                markerPoints.add(0,STATION1);//private ArrayList<LatLng> markerPoints;
+                markerPoints.add(1,STATION);//private ArrayList<LatLng> markerPoints;
+                Log.d("nnnnnnnnnnnn2","nav");
+                navmarker = mMap.addMarker(new MarkerOptions()
+                                                .position(STATION)
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.flag48)));
+                Log.d("nnnnnnnnnnnn3","nav");
+                Directions.getInstance().draw(context, markerPoints.get(0),
+                        markerPoints.get(1), mMap, Directions.MODE_DRIVING);
+                Log.d("nnnnnnnnnnnn4","nav");
+                nav = true;
+
             } catch (IOException e) {
             }
             e_address.getText().clear();
