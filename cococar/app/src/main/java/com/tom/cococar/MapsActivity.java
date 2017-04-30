@@ -187,9 +187,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
+     */    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         //位置權限
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -734,6 +732,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
     protected void onResume(){
         super.onResume();
         Log.d("bag", "url1");
+        rand = UUID.randomUUID().toString();
         liverand = "user-"+rand;
         StopTask stop = new StopTask();
         stop.executeOnExecutor(THREAD_POOL_EXECUTOR,liverand);
