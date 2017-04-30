@@ -737,6 +737,8 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
         liverand = "user-"+rand;
         StopTask stop = new StopTask();
         stop.executeOnExecutor(THREAD_POOL_EXECUTOR,liverand);
+
+        rand = UUID.randomUUID().toString();
     }
 
 }
