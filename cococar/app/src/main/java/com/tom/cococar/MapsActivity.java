@@ -338,7 +338,7 @@ public class MapsActivity extends ActionBarActivity implements OnMapReadyCallbac
                 // 向系統查詢最合適的服務提供者名稱 ( 通常也是 "gps")
                 String provider = locationManager.getBestProvider(criteria, true);
                 //noinspection MissingPermission
-                Location navlocation = locationManager.getLastKnownLocation(provider);
+                Location navlocation = locationManager.getLastKnownLocation("network");
 
                 LatLng STATION1 = new LatLng(navlocation.getLatitude(), navlocation.getLongitude());
                 LatLng STATION = new LatLng(latitude,longitude);
